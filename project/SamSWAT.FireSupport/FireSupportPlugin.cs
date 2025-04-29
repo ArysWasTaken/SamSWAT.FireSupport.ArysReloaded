@@ -1,13 +1,11 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using SamSWAT.FireSupport.ArysReloaded.Database;
-using SamSWAT.FireSupport.ArysReloaded.Patches;
 using SamSWAT.FireSupport.ArysReloaded.Unity;
-using SamSWAT.FireSupport.ArysReloaded.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using UnityToolkit.Utils;
 
 namespace SamSWAT.FireSupport.ArysReloaded;
 
@@ -32,14 +30,13 @@ public class FireSupportPlugin : BaseUnityPlugin
 	
 	private void Awake()
 	{
+		var assembly = Assembly.GetExecutingAssembly();
+		
 		Instance = this;
 		LogSource = Logger;
-		Directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+		Directory = Path.GetDirectoryName(assembly.Location);
 		
-		new GesturesMenuPatch().Enable();
-		new AddItemToDatabasePatch().Enable();
-		new AddLocaleToDatabasePatch().Enable();
-		new InputManagerUtil().Enable();
+		new ModulePatchManager(assembly).EnableAllPatches();
 		
 		InitializeConfigBindings();
 	}

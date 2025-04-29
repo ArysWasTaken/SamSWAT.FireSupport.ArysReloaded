@@ -5,6 +5,7 @@ using EFT.InputSystem;
 using EFT.InventoryLogic;
 using EFT.UI.Gestures;
 using HarmonyLib;
+using JetBrains.Annotations;
 using SamSWAT.FireSupport.ArysReloaded.Unity;
 using SPT.Reflection.Patching;
 using System;
@@ -15,6 +16,7 @@ using UnityEngine;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Patches;
 
+[UsedImplicitly]
 public class GesturesMenuPatch : ModulePatch
 {
 	protected override MethodBase GetTargetMethod()

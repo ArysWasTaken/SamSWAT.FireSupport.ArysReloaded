@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using JetBrains.Annotations;
 using SamSWAT.FireSupport.ArysReloaded.Unity;
 using SPT.Reflection.Patching;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Reflection;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Database;
 
+[UsedImplicitly]
 public class AddLocaleToDatabasePatch : ModulePatch
 {
 	protected override MethodBase GetTargetMethod()

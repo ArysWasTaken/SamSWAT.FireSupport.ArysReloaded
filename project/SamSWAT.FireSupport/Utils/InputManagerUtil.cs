@@ -1,10 +1,12 @@
 ﻿using EFT.InputSystem;
 using HarmonyLib;
+using JetBrains.Annotations;
 using SPT.Reflection.Patching;
 using System.Reflection;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Utils;
 
+[UsedImplicitly]
 internal class InputManagerUtil : ModulePatch
 {
 	private static InputManager _inputManager;

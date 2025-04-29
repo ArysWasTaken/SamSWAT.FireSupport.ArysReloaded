@@ -1,6 +1,7 @@
 ﻿using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using SPT.Reflection.Patching;
 using SPT.Reflection.Utils;
@@ -12,6 +13,7 @@ using System.Reflection;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Database;
 
+[UsedImplicitly]
 public class AddItemToDatabasePatch : ModulePatch
 {
 	protected override MethodBase GetTargetMethod()
