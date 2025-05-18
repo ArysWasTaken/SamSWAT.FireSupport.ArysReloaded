@@ -28,7 +28,7 @@ public sealed class JetStrafeService(
 		
 		IFireSupportBehaviour a10 = FireSupportPoolManager.Instance.TakeFromPool(SupportType);
 		FireSupportController.Instance
-			.StartCooldown(FireSupportPlugin.RequestCooldown.Value, token, OnCooldownOver)
+			.StartCooldown(PluginSettings.RequestCooldown.Value, token, OnCooldownOver)
 			.Forget();
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.StationStrafeRequest);
 		await UniTask.WaitForSeconds(8f);

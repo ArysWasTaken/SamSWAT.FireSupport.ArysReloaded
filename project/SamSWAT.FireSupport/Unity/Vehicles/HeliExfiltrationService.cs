@@ -30,10 +30,10 @@ public sealed class HeliExfiltrationService(
 		var randomEulerAngles = new Vector3(0, Random.Range(0, 360), 0);
 		uh60.ProcessRequest(position, Vector3.zero, randomEulerAngles, token);
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliArrivingToPickup);
-		await UniTask.WaitForSeconds(35f + FireSupportPlugin.HelicopterWaitTime.Value, cancellationToken: token);
+		await UniTask.WaitForSeconds(35f + PluginSettings.HelicopterWaitTime.Value, cancellationToken: token);
 		
 		FireSupportController.Instance
-			.StartCooldown(FireSupportPlugin.RequestCooldown.Value, token, OnCooldownOver)
+			.StartCooldown(PluginSettings.RequestCooldown.Value, token, OnCooldownOver)
 			.Forget();
 	}
 	

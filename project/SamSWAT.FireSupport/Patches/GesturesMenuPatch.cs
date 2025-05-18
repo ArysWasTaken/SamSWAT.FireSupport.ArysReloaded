@@ -61,7 +61,7 @@ public class GesturesMenuPatch : ModulePatch
 		bool locationIsSuitable = gameWorld.MainPlayer.Location.ToLower() == "sandbox"
 			|| LocationScene.GetAll<AirdropPoint>().Any();
 		
-		if (!FireSupportPlugin.Enabled.Value || FireSupportController.Instance != null || !locationIsSuitable)
+		if (!PluginSettings.Enabled.Value || FireSupportController.Instance != null || !locationIsSuitable)
 		{
 			return false;
 		}

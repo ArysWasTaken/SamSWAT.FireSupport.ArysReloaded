@@ -65,7 +65,7 @@ public class HeliExfiltrationPoint : MonoBehaviour, IPhysicsTrigger
 	
 	private void ResetTimer()
 	{
-		_timer = FireSupportPlugin.HelicopterExtractTime.Value;
+		_timer = PluginSettings.HelicopterExtractTime.Value;
 	}
 	
 	private IEnumerator Timer(string profileId)

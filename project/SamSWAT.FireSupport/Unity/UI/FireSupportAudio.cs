@@ -96,7 +96,7 @@ public class FireSupportAudio : ScriptableObject
 		}
 		
 		const BetterAudio.AudioSourceGroupType sourceGroup = BetterAudio.AudioSourceGroupType.Nonspatial;
-		float volume = FireSupportPlugin.VoiceoverVolume.Value / 100f;
+		float volume = PluginSettings.VoiceoverVolume.Value / 100f;
 		Singleton<BetterAudio>.Instance.PlayNonspatial(voAudioClip, sourceGroup, 0, volume);
 	}
 }

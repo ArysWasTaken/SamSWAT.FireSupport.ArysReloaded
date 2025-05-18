@@ -42,13 +42,13 @@ public class FireSupportController : UIInputNode
 		var heliExfil = new HeliExfiltrationService(
 			_spotter,
 			_cancellationTokenSource.Token,
-			FireSupportPlugin.AmountOfExtractionRequests.Value);
+			PluginSettings.AmountOfExtractionRequests.Value);
 		_services.Add(heliExfil.SupportType, heliExfil);
 		
 		var jetStrafe = new JetStrafeService(
 			_spotter,
 			_cancellationTokenSource.Token,
-			FireSupportPlugin.AmountOfStrafeRequests.Value);
+			PluginSettings.AmountOfStrafeRequests.Value);
 		_services.Add(jetStrafe.SupportType, jetStrafe);
 		
 		_ui = await FireSupportUI.Load(_services, gesturesMenu);

@@ -33,7 +33,7 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 		Transform heliTransform = transform;
 		heliTransform.position = position;
 		heliTransform.eulerAngles = rotation;
-		helicopterAnimator.SetFloat(s_flySpeedMultiplier, FireSupportPlugin.HelicopterSpeedMultiplier.Value);
+		helicopterAnimator.SetFloat(s_flySpeedMultiplier, PluginSettings.HelicopterSpeedMultiplier.Value);
 	}
 	
 	public override void ManualUpdate()
@@ -74,14 +74,14 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	{
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliPickingUp);
 		GameObject extractionPoint = CreateExfilPoint();
-		float waitTime = FireSupportPlugin.HelicopterWaitTime.Value * 0.75f;
+		float waitTime = PluginSettings.HelicopterWaitTime.Value * 0.75f;
 		
 		await UniTask.WaitForSeconds(waitTime, cancellationToken: _cancellationToken!.Value);
 		
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliHurry);
 		
 		await UniTask.WaitForSeconds(
-			duration: FireSupportPlugin.HelicopterWaitTime.Value - waitTime,
+			duration: PluginSettings.HelicopterWaitTime.Value - waitTime,
 			cancellationToken: _cancellationToken!.Value);
 		
 		helicopterAnimator.SetTrigger(s_flyAway);
