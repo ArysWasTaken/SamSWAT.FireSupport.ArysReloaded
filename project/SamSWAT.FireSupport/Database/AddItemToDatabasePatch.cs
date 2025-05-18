@@ -14,19 +14,27 @@ using System.Reflection;
 namespace SamSWAT.FireSupport.ArysReloaded.Database;
 
 [UsedImplicitly]
-public class AddItemToDatabasePatch : ModulePatch
+internal class AddItemToDatabasePatch : ModulePatch
 {
+	private static FieldInfo s_jsonConvertersField;
+	
 	protected override MethodBase GetTargetMethod()
 	{
+		s_jsonConvertersField = PatchConstants.EftTypes.Single(IsJsonSerializerType).GetField("Converters");
+		
 		Type fieldType = AccessTools.Field(typeof(ItemFactoryClass), nameof(ItemFactoryClass.ItemTemplates)).FieldType;
 		return AccessTools.Method(fieldType, "Init");
 	}
 	
-	[PatchPostfix]
-	public static void PatchPostfix(Dictionary<MongoID, ItemTemplate> __instance)
+	private static bool IsJsonSerializerType(Type type)
 	{
-		Type t = PatchConstants.EftTypes.Single(x => x.GetField("SerializerSettings") != null);
-		var converters = (JsonConverter[])t.GetField("Converters").GetValue(null);
+		return AccessTools.Field(type, "SerializerSettings") != null;
+	}
+	
+	[PatchPostfix]
+	private static void PatchPostfix(Dictionary<MongoID, ItemTemplate> __instance)
+	{
+		var converters = (JsonConverter[])s_jsonConvertersField.GetValue(null);
 		string databasePath = Path.Combine(FireSupportPlugin.Directory, "database");
 		
 		string jsonPath = Path.Combine(databasePath, "ammo_30x173_gau8_avenger.json");

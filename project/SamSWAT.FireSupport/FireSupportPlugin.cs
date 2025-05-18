@@ -48,19 +48,17 @@ public class FireSupportPlugin : BaseUnityPlugin
 			return;
 		}
 		
-		_componentsToUpdate.RemoveAll(x => x.IsMarkedForRemoval());
-
+		_componentsToUpdate.RemoveAll(UpdatableComponentBase.IsMarkedForRemoval);
+		
 		int count = _componentsToUpdate.Count;
 		for (var i = 0; i < count; i++)
 		{
 			UpdatableComponentBase component = _componentsToUpdate[i];
 			
-			if (component.IsMarkedForRemoval() || !component.HasFinishedInitialization)
+			if (!component.IsMarkedForRemoval() && component.HasFinishedInitialization)
 			{
-				continue;
+				component.ManualUpdate();
 			}
-			
-			component.ManualUpdate();
 		}
 	}
 }

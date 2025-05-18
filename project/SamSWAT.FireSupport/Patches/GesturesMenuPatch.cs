@@ -25,7 +25,7 @@ public class GesturesMenuPatch : ModulePatch
 	}
 	
 	[PatchPostfix]
-	public static async void PatchPostfix(GesturesMenu __instance)
+	private static async void PatchPostfix(GesturesMenu __instance)
 	{
 		if (!IsFireSupportAvailable())
 		{
@@ -52,16 +52,13 @@ public class GesturesMenuPatch : ModulePatch
 	
 	private static bool IsFireSupportAvailable()
 	{
-		GameWorld gameWorld = Singleton<GameWorld>.Instance;
-		if (gameWorld == null)
+		if (!PluginSettings.Enabled.Value)
 		{
 			return false;
 		}
 		
-		bool locationIsSuitable = gameWorld.MainPlayer.Location.ToLower() == "sandbox"
-			|| LocationScene.GetAll<AirdropPoint>().Any();
-		
-		if (!PluginSettings.Enabled.Value || FireSupportController.Instance != null || !locationIsSuitable)
+		GameWorld gameWorld = Singleton<GameWorld>.Instance;
+		if (gameWorld == null)
 		{
 			return false;
 		}
@@ -72,9 +69,20 @@ public class GesturesMenuPatch : ModulePatch
 			return false;
 		}
 		
+		bool locationIsSuitable = player.Location.ToLower() == "sandbox" || LocationScene.GetAll<AirdropPoint>().Any();
+		if (!locationIsSuitable)
+		{
+			return false;
+		}
+		
 		Inventory inventory = player.Profile.Inventory;
-		bool hasRangefinder = inventory.AllRealPlayerItems.Any(x => x.TemplateId == ItemConstants.RANGEFINDER_TPL);
+		bool hasRangefinder = inventory.AllRealPlayerItems.Any(IsRangefinder);
 		
 		return hasRangefinder;
+	}
+	
+	private static bool IsRangefinder(Item item)
+	{
+		return item.TemplateId == ItemConstants.RANGEFINDER_TPL;
 	}
 }
