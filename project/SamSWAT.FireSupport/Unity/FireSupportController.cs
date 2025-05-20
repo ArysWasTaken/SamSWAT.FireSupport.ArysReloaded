@@ -94,36 +94,44 @@ public class FireSupportController : UIInputNode
 	
 	public async UniTaskVoid StartCooldown(float time, CancellationToken cancellationToken, Action callback = null)
 	{
-		_ui.timerText.enabled = true;
-		
-		while (time > 0)
+		try
 		{
-			time -= Time.deltaTime;
-			if (time < 0)
+			_ui.timerText.enabled = true;
+			
+			while (time > 0)
 			{
-				time = 0;
+				time -= Time.deltaTime;
+				if (time < 0)
+				{
+					time = 0;
+				}
+				
+				float minutes = Mathf.FloorToInt(time / 60);
+				float seconds = Mathf.FloorToInt(time % 60);
+				
+				using (Utf16ValueStringBuilder sb = ZString.CreateStringBuilder())
+				{
+					sb.AppendFormat("{0:00}.{1:00}", minutes, seconds);
+					_ui.timerText.text = sb.ToString();
+				}
+				
+				await UniTask.NextFrame(cancellationToken);
 			}
 			
-			float minutes = Mathf.FloorToInt(time / 60);
-			float seconds = Mathf.FloorToInt(time % 60);
+			_ui.timerText.enabled = false;
 			
-			using (Utf16ValueStringBuilder sb = ZString.CreateStringBuilder())
+			if (_services.AnyAvailableRequests())
 			{
-				sb.AppendFormat("{0:00}.{1:00}", minutes, seconds);
-				_ui.timerText.text = sb.ToString();
+				FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.StationAvailable);
 			}
 			
-			await UniTask.NextFrame(cancellationToken);
+			callback?.Invoke();
 		}
-		
-		_ui.timerText.enabled = false;
-		
-		if (_services.AnyAvailableRequests())
+		catch (OperationCanceledException) {}
+		catch (Exception ex)
 		{
-			FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.StationAvailable);
+			FireSupportPlugin.LogSource.LogError(ex);
 		}
-		
-		callback?.Invoke();
 	}
 	
 	public override ETranslateResult TranslateCommand(ECommand command)
