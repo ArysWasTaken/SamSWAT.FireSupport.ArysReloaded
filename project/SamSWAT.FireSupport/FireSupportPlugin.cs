@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using SamSWAT.FireSupport.ArysReloaded.Unity;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -12,6 +13,7 @@ namespace SamSWAT.FireSupport.ArysReloaded;
 public class FireSupportPlugin : BaseUnityPlugin
 {
 	private readonly List<UpdatableComponentBase> _componentsToUpdate = [];
+	private Predicate<UpdatableComponentBase> _isMarkedForRemovalPredicate;
 	
 	public static FireSupportPlugin Instance { get; private set; }
 	
@@ -48,7 +50,7 @@ public class FireSupportPlugin : BaseUnityPlugin
 			return;
 		}
 		
-		_componentsToUpdate.RemoveAll(UpdatableComponentBase.IsMarkedForRemoval);
+		_componentsToUpdate.RemoveAll(_isMarkedForRemovalPredicate ??= UpdatableComponentBase.IsMarkedForRemoval);
 		
 		int count = _componentsToUpdate.Count;
 		for (var i = 0; i < count; i++)
