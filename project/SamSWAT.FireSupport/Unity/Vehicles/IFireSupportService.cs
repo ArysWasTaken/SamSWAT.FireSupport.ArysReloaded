@@ -9,5 +9,5 @@ public interface IFireSupportService
 	public int AvailableRequests { get; }
 	
 	public bool IsRequestAvailable();
-	public UniTaskVoid PlanRequest();
+	public UniTaskVoid PlanRequest(CancellationToken cancellationToken);
 }
