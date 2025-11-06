@@ -108,25 +108,6 @@
     <Compile Remove="build\**" />
     <EmbeddedResource Remove="build\**" />
   </ItemGroup>
-
-  <Target Name="GeneratePluginMetadata" BeforeTargets="BeforeCompile" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)PluginMetadata.cs">
-    <ItemGroup>
-      <PluginMetadataFilePath Include="$(IntermediateOutputPath)PluginMetadata.cs" />
-      <GeneratedText Include="// -- Auto-generated at build time --" />
-      <GeneratedText Include="// --------- DO NOT MODIFY ----------" />
-      <GeneratedText Include="%23pragma warning disable CS1591 // Missing XML comment for publicly visible type or member" />
-      <GeneratedText Include="namespace $(RootNamespace)%3B" />
-      <GeneratedText Include="internal static class PluginMetadata" />
-      <GeneratedText Include="%7B" />
-      <GeneratedText Include='%09public const string VERSION = "$(Version)"%3B' />
-      <GeneratedText Include='%09public const string TARGET_SPT_VERSION = "$(TargetSptVersion)"%3B' />
-      <GeneratedText Include="%7D" />
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Include="@(PluginMetadataFilePath)" />
-    </ItemGroup>
-    <WriteLinesToFile File="@(PluginMetadataFilePath)" Lines="@(GeneratedText)" Overwrite="true" />
-  </Target>
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if not exist &quot;$(SptBepInExPluginsDir)$(SolutionName)&quot; (&#xA;    mkdir &quot;$(SptBepInExPluginsDir)$(SolutionName)&quot;&#xA;)&#xA;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(SptBepInExPluginsDir)$(SolutionName)\$(TargetFileName)&quot;&#xA;(robocopy &quot;$(CopyToOutputDir)&quot; &quot;$(SptBepInExPluginsDir)$(SolutionName)&quot; /E /XF .gitkeep) ^&amp; if %ERRORLEVEL% leq 3 exit 0" />
