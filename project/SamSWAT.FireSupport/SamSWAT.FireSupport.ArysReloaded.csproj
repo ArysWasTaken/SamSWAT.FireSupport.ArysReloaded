@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>SamSWAT.FireSupport.ArysReloaded</RootNamespace>
-    <AssemblyName>SamSWAT.FireSupport.ArysReloaded</AssemblyName>
+    <AssemblyName>SamSWAT.FireSupport.ArysReloaded.Core</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Authors>SamSWAT, Arys</Authors>
