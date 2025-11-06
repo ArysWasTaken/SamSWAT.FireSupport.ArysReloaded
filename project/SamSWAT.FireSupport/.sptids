@@ -3,8 +3,8 @@
     "en": {
       "Name": "PGU-13/B HEI High Explosive Incendiary",
       "ShortName": "PGU-13/B HEI",
-      "Type": "AMMO",
-      "Weight": 0.5,
+      "Type": "ITEM",
+      "Weight": 0.35,
       "Description": "The PGU-13/B HEI High Explosive Incendiary round employs a standard M505 fuze and explosive mixture with a body of naturally fragmenting material that is effective against lighter vehicle and material targets."
     }
   },
@@ -12,9 +12,9 @@
     "en": {
       "Name": "Fairchild Republic A-10 Thunderbolt II",
       "ShortName": "A-10 Thunderbolt II",
-      "Type": "WEAPON",
-      "Weight": 0.5,
-      "Description": "Close air support attack aircraft developed by Fairchild Republic for the USAF with mounted GAU-8/A Avenger 30mm autocannon."
+      "Type": "ITEM",
+      "Weight": 0.1,
+      "Description": "Close air support attack aircraft developed by Fairchild Republic for the USAF with a mounted GAU-8/A Avenger 30mm autocannon."
     }
   }
 }
