@@ -68,22 +68,22 @@
     <NoWarn>1701;1702;0649</NoWarn>
   </PropertyGroup>
 
-  <Target Name="GeneratePluginMetadata" BeforeTargets="BeforeCompile" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)PluginMetadata.cs">
+  <Target Name="GenerateModMetadata" BeforeTargets="BeforeCompile" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)ModMetadata.cs">
     <ItemGroup>
-      <PluginMetadataFilePath Include="$(IntermediateOutputPath)PluginMetadata.cs" />
+      <ModMetadataFilePath Include="$(IntermediateOutputPath)ModMetadata.cs" />
       <GeneratedText Include="// -- Auto-generated at build time --" />
       <GeneratedText Include="// --------- DO NOT MODIFY ----------" />
       <GeneratedText Include="%23pragma warning disable CS1591 // Missing XML comment for publicly visible type or member" />
       <GeneratedText Include="namespace $(RootNamespace)%3B" />
-      <GeneratedText Include="internal static class PluginMetadata" />
+      <GeneratedText Include="internal static class ModMetadata" />
       <GeneratedText Include="%7B" />
       <GeneratedText Include='%09public const string VERSION = "$(Version)"%3B' />
       <GeneratedText Include='%09public const string TARGET_SPT_VERSION = "$(TargetSptVersion)"%3B' />
       <GeneratedText Include="%7D" />
     </ItemGroup>
     <ItemGroup>
-      <Compile Include="@(PluginMetadataFilePath)" />
+      <Compile Include="@(ModMetadataFilePath)" />
     </ItemGroup>
-    <WriteLinesToFile File="@(PluginMetadataFilePath)" Lines="@(GeneratedText)" Overwrite="true" />
+    <WriteLinesToFile File="@(ModMetadataFilePath)" Lines="@(GeneratedText)" Overwrite="true" />
   </Target>
 </Project>

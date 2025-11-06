@@ -9,8 +9,8 @@ using System.Reflection;
 
 namespace SamSWAT.FireSupport.ArysReloaded;
 
-[BepInPlugin("com.SamSWAT.FireSupport.ArysReloaded", "SamSWAT's FireSupport: Arys Reloaded", PluginMetadata.VERSION)]
-[BepInDependency("com.SPT.core", PluginMetadata.TARGET_SPT_VERSION)]
+[BepInPlugin("com.samswat.firesupport.arysreloaded", "SamSWAT's FireSupport: Arys Reloaded", ModMetadata.VERSION)]
+[BepInDependency("com.SPT.core", ModMetadata.TARGET_SPT_VERSION)]
 [BepInDependency("com.arys.unitytoolkit", "2.0.0")]
 public class FireSupportPlugin : BaseUnityPlugin
 {
