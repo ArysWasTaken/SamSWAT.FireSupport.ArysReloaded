@@ -22,6 +22,7 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	public AudioSource rotorsDistantSource;
 	
 	private CancellationToken _cancellationToken;
+	private GameWorld _gameWorld;
 	
 	public override ESupportType SupportType => ESupportType.Extract;
 	
@@ -43,6 +44,8 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	
 	protected override void OnAwake()
 	{
+		_gameWorld = Singleton<GameWorld>.Instance;
+		
 		AudioMixerGroup outputAudioMixerGroup = Singleton<BetterAudio>.Instance.OutEnvironment;
 		engineCloseSource.outputAudioMixerGroup = outputAudioMixerGroup;
 		engineDistantSource.outputAudioMixerGroup = outputAudioMixerGroup;
@@ -54,13 +57,12 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	
 	private void CrossFadeAudio()
 	{
-		GameWorld gameWorld = Singleton<GameWorld>.Instance;
-		if (!PlayerHelper.IsMainPlayerAlive())
+		if (!_gameWorld.IsMainPlayerAlive())
 		{
 			return;
 		}
 		
-		float distance = Vector3.Distance(gameWorld.MainPlayer.CameraPosition.position, rotorsCloseSource.transform.position);
+		float distance = Vector3.Distance(_gameWorld.MainPlayer.CameraPosition.position, rotorsCloseSource.transform.position);
 		float volume = volumeCurve.Evaluate(distance);
 		
 		rotorsCloseSource.volume = Mathf.Clamp01(volume);

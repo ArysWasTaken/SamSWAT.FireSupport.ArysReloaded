@@ -25,6 +25,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 	private FireSupportAudio _fireSupportAudio;
 	
 	private VehicleWeapon _weapon;
+	private GameWorld _gameWorld;
 	private Player _player;
 	
 	public override ESupportType SupportType => ESupportType.Strafe;
@@ -63,7 +64,8 @@ public sealed class A10Behaviour : FireSupportBehaviour
 	{
 		_fireSupportAudio = FireSupportAudio.Instance;
 		_betterAudio = Singleton<BetterAudio>.Instance;
-		_player = Singleton<GameWorld>.Instance.MainPlayer;
+		_gameWorld = Singleton<GameWorld>.Instance;
+		_player = _gameWorld.MainPlayer;
 		_weapon = new VehicleWeapon(_player.ProfileId, ItemConstants.GAU8_WEAPON_TPL, ItemConstants.GAU8_AMMO_TPL);
 		
 		HasFinishedInitialization = true;
@@ -94,7 +96,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		Gau8Sequence(strafePos, cancellationToken).Forget();
 		await UniTask.WaitForSeconds(2f, cancellationToken: cancellationToken);
 		
-		if (!PlayerHelper.IsMainPlayerAlive())
+		if (!_gameWorld.IsMainPlayerAlive())
 		{
 			return;
 		}
@@ -113,7 +115,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		gau8Particles.SetActive(false);
 		await UniTask.WaitForSeconds(3.5f, cancellationToken: cancellationToken);
 		
-		if (!PlayerHelper.IsMainPlayerAlive())
+		if (!_gameWorld.IsMainPlayerAlive())
 		{
 			return;
 		}
@@ -151,13 +153,8 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		Vector3 gau8LeftDir = Vector3.Cross(gau8Dir, Vector3.up).normalized;
 		
 		var ammoCounter = 50;
-		while (ammoCounter > 0)
+		while (ammoCounter > 0 && _gameWorld.IsMainPlayerAlive())
 		{
-			if (!PlayerHelper.IsMainPlayerAlive())
-			{
-				break;
-			}
-			
 			Vector3 leftRightSpread = gau8LeftDir * Random.Range(-0.007f, 0.007f);
 			gau8Dir = Vector3.Normalize(gau8Dir + new Vector3(0, 0.00037f, 0));
 			Vector3 projectileDir = Vector3.Normalize(gau8Dir + leftRightSpread);
