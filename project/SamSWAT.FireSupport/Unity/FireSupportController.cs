@@ -15,7 +15,6 @@ namespace SamSWAT.FireSupport.ArysReloaded.Unity;
 /// </summary>
 public class FireSupportController : UIInputNode
 {
-	[NonSerialized] private CancellationTokenSource _cancellationTokenSource;
 	[NonSerialized] private FireSupportAudio _audio;
 	[NonSerialized] private FireSupportUI _ui;
 	[NonSerialized] private FireSupportSpotter _spotter;
@@ -34,20 +33,17 @@ public class FireSupportController : UIInputNode
 	
 	private async UniTask Initialize(GesturesMenu gesturesMenu)
 	{
-		_cancellationTokenSource = new CancellationTokenSource();
 		_gesturesMenu = gesturesMenu;
 		_audio = await FireSupportAudio.Create();
 		_spotter = await FireSupportSpotter.Load();
 		
 		var heliExfil = new HeliExfiltrationService(
 			_spotter,
-			_cancellationTokenSource.Token,
 			PluginSettings.AmountOfExtractionRequests.Value);
 		_services.Add(heliExfil.SupportType, heliExfil);
 		
 		var jetStrafe = new JetStrafeService(
 			_spotter,
-			_cancellationTokenSource.Token,
 			PluginSettings.AmountOfStrafeRequests.Value);
 		_services.Add(jetStrafe.SupportType, jetStrafe);
 		
@@ -62,8 +58,6 @@ public class FireSupportController : UIInputNode
 	private void OnDestroy()
 	{
 		_ui.SupportRequested -= OnSupportRequested;
-		_cancellationTokenSource.Cancel();
-		_cancellationTokenSource.Dispose();
 		AssetLoader.UnloadAllBundles();
 	}
 	
@@ -83,7 +77,7 @@ public class FireSupportController : UIInputNode
 			}
 			
 			_gesturesMenu.Close();
-			service.PlanRequest().Forget();
+			service.PlanRequest(destroyCancellationToken).Forget();
 		}
 		catch (OperationCanceledException) {}
 		catch (Exception ex)

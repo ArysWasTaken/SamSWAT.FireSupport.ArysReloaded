@@ -21,7 +21,7 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	public AudioSource rotorsCloseSource;
 	public AudioSource rotorsDistantSource;
 	
-	private CancellationToken? _cancellationToken;
+	private CancellationToken _cancellationToken;
 	
 	public override ESupportType SupportType => ESupportType.Extract;
 	
@@ -76,13 +76,13 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 		GameObject extractionPoint = CreateExfilPoint();
 		float waitTime = PluginSettings.HelicopterWaitTime.Value * 0.75f;
 		
-		await UniTask.WaitForSeconds(waitTime, cancellationToken: _cancellationToken!.Value);
+		await UniTask.WaitForSeconds(waitTime, cancellationToken: _cancellationToken);
 		
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliHurry);
 		
 		await UniTask.WaitForSeconds(
 			duration: PluginSettings.HelicopterWaitTime.Value - waitTime,
-			cancellationToken: _cancellationToken!.Value);
+			cancellationToken: _cancellationToken);
 		
 		helicopterAnimator.SetTrigger(s_flyAway);
 		Destroy(extractionPoint);
@@ -97,7 +97,7 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	[UsedImplicitly]
 	private void OnHelicopterLeft()
 	{
-		_cancellationToken = null;
+		_cancellationToken = CancellationToken.None;
 		ReturnToPool();
 	}
 	
