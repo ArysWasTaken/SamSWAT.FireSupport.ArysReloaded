@@ -10,9 +10,9 @@ using SamSWAT.FireSupport.ArysReloaded.Unity;
 using SPT.Reflection.Patching;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using ZLinq;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Patches;
 
@@ -23,7 +23,7 @@ public class GesturesMenuPatch : ModulePatch
 	{
 		return typeof(GesturesMenu).GetMethod(nameof(GesturesMenu.Init));
 	}
-	
+
 	[PatchPostfix]
 	private static async void PatchPostfix(GesturesMenu __instance)
 	{
@@ -31,7 +31,7 @@ public class GesturesMenuPatch : ModulePatch
 		{
 			return;
 		}
-		
+
 		try
 		{
 			var owner = Singleton<GameWorld>.Instance.MainPlayer.GetComponent<GamePlayerOwner>();
@@ -40,8 +40,9 @@ public class GesturesMenuPatch : ModulePatch
 				.Field<List<InputNode>>("_children")
 				.Value
 				.Add(fireSupportController);
-			
-			var gesturesBindPanel = __instance.gameObject.GetComponentInChildren<GesturesBindPanel>(includeInactive: true);
+
+			var gesturesBindPanel =
+				__instance.gameObject.GetComponentInChildren<GesturesBindPanel>(includeInactive: true);
 			gesturesBindPanel.transform.localPosition = new Vector3(0, -530, 0);
 		}
 		catch (Exception ex)
@@ -49,38 +50,36 @@ public class GesturesMenuPatch : ModulePatch
 			FireSupportPlugin.LogSource.LogError(ex);
 		}
 	}
-	
+
 	private static bool IsFireSupportAvailable()
 	{
 		if (!PluginSettings.Enabled.Value)
 		{
 			return false;
 		}
-		
+
 		GameWorld gameWorld = Singleton<GameWorld>.Instance;
 		if (gameWorld == null)
 		{
 			return false;
 		}
-		
+
 		Player player = gameWorld.MainPlayer;
 		if (player == null)
 		{
 			return false;
 		}
-		
-		bool locationIsSuitable = player.Location.ToLower() == "sandbox" || LocationScene.GetAll<AirdropPoint>().Any();
+
+		bool locationIsSuitable = player.Location.ToLower() == "sandbox" || LocationScene.GetAll<AirdropPoint>().AsValueEnumerable().Any();
 		if (!locationIsSuitable)
 		{
 			return false;
 		}
-		
-		Inventory inventory = player.Profile.Inventory;
-		bool hasRangefinder = inventory.AllRealPlayerItems.Any(IsRangefinder);
-		
+
+		bool hasRangefinder = player.Profile.Inventory.AllRealPlayerItems.AsValueEnumerable().Any(IsRangefinder);
 		return hasRangefinder;
 	}
-	
+
 	private static bool IsRangefinder(Item item)
 	{
 		return item.TemplateId == ItemConstants.RANGEFINDER_TPL;

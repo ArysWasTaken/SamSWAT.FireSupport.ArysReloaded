@@ -1,7 +1,10 @@
 ﻿using Comfort.Common;
 using Cysharp.Threading.Tasks;
 using SamSWAT.FireSupport.ArysReloaded.Utils;
+using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Unity;
 
@@ -34,69 +37,38 @@ public class FireSupportAudio : ScriptableObject
 	
 	public void PlayVoiceover(EVoiceoverType voiceoverType)
 	{
-		AudioClip voAudioClip;
-		
-		switch (voiceoverType)
+		AudioClip voAudioClip = voiceoverType switch
 		{
-			case EVoiceoverType.StationReminder:
-				voAudioClip = stationReminder[Random.Range(0, stationReminder.Length)];
-				break;
-			case EVoiceoverType.StationAvailable:
-				voAudioClip = stationAvailable[Random.Range(0, stationAvailable.Length)];
-				break;
-			case EVoiceoverType.StationDoesNotHear:
-				voAudioClip = stationDoesNotHear[Random.Range(0, stationDoesNotHear.Length)];
-				break;
-			case EVoiceoverType.StationStrafeRequest:
-				voAudioClip = stationStrafeRequest[Random.Range(0, stationStrafeRequest.Length)];
-				break;
-			case EVoiceoverType.StationStrafeEnd:
-				voAudioClip = stationStrafeEnd[Random.Range(0, stationStrafeEnd.Length)];
-				break;
-			case EVoiceoverType.StationExtractionRequest:
-				voAudioClip = stationExtractionRequest[Random.Range(0, stationExtractionRequest.Length)];
-				break;
-			case EVoiceoverType.JetArriving:
-				voAudioClip = jetArriving[Random.Range(0, jetArriving.Length)];
-				break;
-			case EVoiceoverType.JetFiring:
-				voAudioClip = jetFiring[Random.Range(0, jetFiring.Length)];
-				break;
-			case EVoiceoverType.JetLeaving:
-				voAudioClip = jetLeaving[Random.Range(0, jetLeaving.Length)];
-				break;
-			case EVoiceoverType.SupportHeliArriving:
-				voAudioClip = supportHeliArriving[Random.Range(0, supportHeliArriving.Length)];
-				break;
-			case EVoiceoverType.SupportHeliArrivingToPickup:
-				voAudioClip = supportHeliArrivingToPickup[Random.Range(0, supportHeliArrivingToPickup.Length)];
-				break;
-			case EVoiceoverType.SupportHeliPickingUp:
-				voAudioClip = supportHeliPickingUp[Random.Range(0, supportHeliPickingUp.Length)];
-				break;
-			case EVoiceoverType.SupportHeliHurry:
-				voAudioClip = supportHeliHurry[Random.Range(0, supportHeliHurry.Length)];
-				break;
-			case EVoiceoverType.SupportHeliLeaving:
-				voAudioClip = supportHeliLeaving[Random.Range(0, supportHeliLeaving.Length)];
-				break;
-			case EVoiceoverType.SupportHeliLeavingAfterPickup:
-				voAudioClip = supportHeliLeavingAfterPickup[Random.Range(0, supportHeliLeavingAfterPickup.Length)];
-				break;
-			case EVoiceoverType.SupportHeliLeavingNoPickup:
-				voAudioClip = supportHeliLeavingNoPickup[Random.Range(0, supportHeliLeavingNoPickup.Length)];
-				break;
-			default:
-				return;
-		}
-		
-		if (voAudioClip == null)
-		{
-			return;
-		}
-		
+			EVoiceoverType.StationReminder => stationReminder.GetRandomClip(),
+			EVoiceoverType.StationAvailable => stationAvailable.GetRandomClip(),
+			EVoiceoverType.StationDoesNotHear => stationDoesNotHear.GetRandomClip(),
+			EVoiceoverType.StationStrafeRequest => stationStrafeRequest.GetRandomClip(),
+			EVoiceoverType.StationStrafeEnd => stationStrafeEnd.GetRandomClip(),
+			EVoiceoverType.StationExtractionRequest => stationExtractionRequest.GetRandomClip(),
+			EVoiceoverType.JetArriving => jetArriving.GetRandomClip(),
+			EVoiceoverType.JetFiring => jetFiring.GetRandomClip(),
+			EVoiceoverType.JetLeaving => jetLeaving.GetRandomClip(),
+			EVoiceoverType.SupportHeliArriving => supportHeliArriving.GetRandomClip(),
+			EVoiceoverType.SupportHeliArrivingToPickup => supportHeliArrivingToPickup.GetRandomClip(),
+			EVoiceoverType.SupportHeliPickingUp => supportHeliPickingUp.GetRandomClip(),
+			EVoiceoverType.SupportHeliHurry => supportHeliHurry.GetRandomClip(),
+			EVoiceoverType.SupportHeliLeaving => supportHeliLeaving.GetRandomClip(),
+			EVoiceoverType.SupportHeliLeavingAfterPickup => supportHeliLeavingAfterPickup.GetRandomClip(),
+			EVoiceoverType.SupportHeliLeavingNoPickup => supportHeliLeavingNoPickup.GetRandomClip(),
+			_ => throw new ArgumentException("Invalid voiceover type")
+		};
+
 		const BetterAudio.AudioSourceGroupType sourceGroup = BetterAudio.AudioSourceGroupType.Nonspatial;
 		float volume = PluginSettings.VoiceoverVolume.Value / 100f;
 		Singleton<BetterAudio>.Instance.PlayNonspatial(voAudioClip, sourceGroup, 0, volume);
+	}
+}
+
+internal static class AudioClipExtensions
+{
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static AudioClip GetRandomClip(this AudioClip[] clips)
+	{
+		return clips[Random.Range(0, clips.Length)];
 	}
 }

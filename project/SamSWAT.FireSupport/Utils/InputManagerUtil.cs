@@ -9,21 +9,21 @@ namespace SamSWAT.FireSupport.ArysReloaded.Utils;
 [UsedImplicitly]
 internal class InputManagerUtil : ModulePatch
 {
-	private static InputManager _inputManager;
-	
+	private static InputManager s_inputManager;
+
 	protected override MethodBase GetTargetMethod()
 	{
 		return AccessTools.DeclaredMethod(typeof(InputManager), nameof(InputManager.Create));
 	}
-	
+
 	[PatchPostfix]
 	private static void PatchPostfix(InputManager __result)
 	{
-		_inputManager = __result;
+		s_inputManager = __result;
 	}
-	
+
 	internal static InputManager GetInputManager()
 	{
-		return _inputManager;
+		return s_inputManager;
 	}
 }

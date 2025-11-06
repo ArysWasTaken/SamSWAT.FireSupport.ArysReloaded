@@ -4,11 +4,9 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using SPT.Reflection.Patching;
-using SPT.Reflection.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Database;
@@ -16,46 +14,35 @@ namespace SamSWAT.FireSupport.ArysReloaded.Database;
 [UsedImplicitly]
 internal class AddItemToDatabasePatch : ModulePatch
 {
-	private static FieldInfo s_jsonConvertersField;
-	
+	private static readonly string s_databasePath = Path.Combine(FireSupportPlugin.Directory, "database");
+
 	protected override MethodBase GetTargetMethod()
 	{
-		s_jsonConvertersField = PatchConstants.EftTypes.Single(IsJsonSerializerType).GetField("Converters");
-		
 		Type fieldType = AccessTools.Field(typeof(ItemFactoryClass), nameof(ItemFactoryClass.ItemTemplates)).FieldType;
 		return AccessTools.Method(fieldType, "Init");
 	}
-	
-	private static bool IsJsonSerializerType(Type type)
-	{
-		return AccessTools.Field(type, "SerializerSettings") != null;
-	}
-	
+
 	[PatchPostfix]
-	private static void PatchPostfix(Dictionary<MongoID, ItemTemplate> __instance)
+	private static void PatchPostfix(ref Dictionary<MongoID, ItemTemplate> __instance)
 	{
-		var converters = (JsonConverter[])s_jsonConvertersField.GetValue(null);
-		string databasePath = Path.Combine(FireSupportPlugin.Directory, "database");
-		
-		string jsonPath = Path.Combine(databasePath, "ammo_30x173_gau8_avenger.json");
-		var gau8Ammo = LoadJson<AmmoTemplate>(jsonPath, converters);
-		AddItemTo(gau8Ammo, __instance);
-		
-		jsonPath = Path.Combine(databasePath, "weapon_ge_gau8_avenger_30x173.json");
-		var gau8Weapon = LoadJson<WeaponTemplate>(jsonPath, converters);
-		AddItemTo(gau8Weapon, __instance);
+		var gau8Ammo = GetItemTemplate<AmmoTemplate>("ammo_30x173_gau8_avenger.json");
+		AddItemTo(gau8Ammo, ref __instance);
+
+		var gau8Weapon = GetItemTemplate<WeaponTemplate>("weapon_ge_gau8_avenger_30x173.json");
+		AddItemTo(gau8Weapon, ref __instance);
 	}
-	
-	private static T LoadJson<T>(string jsonPath, JsonConverter[] converters)
+
+	private static T GetItemTemplate<T>(string jsonFileName)
 	{
+		string jsonPath = Path.Combine(s_databasePath, jsonFileName);
 		string json = File.ReadAllText(jsonPath);
-		return JsonConvert.DeserializeObject<T>(json, converters);
+		return JsonConvert.DeserializeObject<T>(json, JsonSerializerSettingsClass.Converters);
 	}
-	
-	private static void AddItemTo(ItemTemplate itemTemplate, Dictionary<MongoID, ItemTemplate> dictionary)
+
+	private static void AddItemTo(ItemTemplate itemTemplate, ref Dictionary<MongoID, ItemTemplate> dictionary)
 	{
 		dictionary.Add(itemTemplate._id, itemTemplate);
-		
+
 		MongoID? parentId = itemTemplate.ParentId;
 		if (parentId.HasValue)
 		{

@@ -10,7 +10,7 @@ public abstract class FireSupportBehaviour : UpdatableComponentBase, IFireSuppor
 	public abstract void ProcessRequest(Vector3 position, Vector3 direction, Vector3 rotation,
 		CancellationToken cancellationToken);
 	
-	public virtual void ReturnToPool()
+	public void ReturnToPool()
 	{
 		FireSupportPoolManager.Instance.ReturnToPool(this);
 	}

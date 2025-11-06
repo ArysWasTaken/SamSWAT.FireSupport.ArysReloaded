@@ -94,7 +94,7 @@ public class FireSupportController : UIInputNode
 			
 			while (time > 0)
 			{
-				time -= Time.deltaTime;
+				time--;
 				if (time < 0)
 				{
 					time = 0;
@@ -109,7 +109,7 @@ public class FireSupportController : UIInputNode
 					_ui.timerText.text = sb.ToString();
 				}
 				
-				await UniTask.NextFrame(cancellationToken);
+				await UniTask.WaitForSeconds(1, cancellationToken: cancellationToken);
 			}
 			
 			_ui.timerText.enabled = false;
