@@ -94,19 +94,22 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		
 		// Fire GAU8
 		Gau8Sequence(strafePos, cancellationToken).Forget();
-		await UniTask.WaitForSeconds(2f, cancellationToken: cancellationToken);
-		
+
 		if (!_gameWorld.IsMainPlayerAlive())
 		{
 			return;
 		}
+
+		float distanceFromPlayer = Vector3.Distance(_player.CameraPosition.position, strafePos);
+		const float soundSpeedMS = 343;
+		await UniTask.WaitForSeconds(distanceFromPlayer / soundSpeedMS, cancellationToken: cancellationToken);
 		
 		// Play explosion sfx
 		// TODO: This should be the sfx for the actual projectile instead of manually being played here
 		_betterAudio.PlayAtPoint(
 			strafePos,
 			gau8ExpSounds.GetRandomClip(),
-			Vector3.Distance(_player.CameraPosition.position, strafePos),
+			distanceFromPlayer,
 			BetterAudio.AudioSourceGroupType.Gunshots,
 			1200
 		);
