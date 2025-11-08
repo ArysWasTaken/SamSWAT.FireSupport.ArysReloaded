@@ -7,17 +7,15 @@
 
 This mod was originally made by <a href="https://github.com/SamSWAT911">SamSWAT911</a>.
 
-In their absence, I have decided to update the beloved FireSupport mod for 3.7.4; it will likely work with 3.7.1 to 3.7.4, but I have not tested the others besides 3.7.4.
-
-At the moment, I have no plans to release a version for 3.6.x.
+In their absence, I have decided to maintain the beloved FireSupport mod.
 
 <a href="#"><img src="https://media.discordapp.net/attachments/417281262085210112/1013842879715749999/140818-F-PO994-258-scaled.jpg?width=1440&height=450"></a>
 
 # Fire Support
 
-BepInEx mod for [SPT-AKI](https://hub.sp-tarkov.com/files/file/6-spt-aki/) emulator that will add insurgency-style fire support options into Escape From Tarkov.
+BepInEx mod for SPT that will add insurgency-style fire support options into Escape From Tarkov.
 
-This mod is tied to the in-game [rangefinder](https://escapefromtarkov.fandom.com/wiki/Vortex_Ranger_1500_rangefinder), so make sure it's in your inventory before you go into a raid. After you enter location, you will hear a radio message saying something like support is now available. Currently only A-10 autocannon strafe is implemented but I have plans to extend it later.
+This mod is tied to the in-game [rangefinder](https://escapefromtarkov.fandom.com/wiki/Vortex_Ranger_1500_rangefinder), so make sure it's in your inventory before you go into a raid. After you enter location, you will hear a radio message saying something like support is now available. Currently only A-10 autocannon strafe is implemented, but I have plans to extend it later.
 
 Double tap `Y` key (by default) to open gestures menu where you should notice new radial menu with available requests, their respective amounts and timer appearing after request in the center circle.
 
@@ -57,21 +55,19 @@ Full video demonstration of this mod on YouTube:
 ### How to install
 
 1. Download the latest release here: [link](https://github.com/Nympfonic/SamSWAT.FireSupport.ArysReloaded/releases) -OR- build from source (instructions below)
-2. Extract the 7z file and drop the whole folder `SamSWAT.FireSupport.ArysReloaded` into `BepInEx/plugins/` directory.
+2. Extract the 7z file and drop the folders `BepInEx` and `SPT` into your game directory.
 
 ### Requirements
 
-- Visual Studio 2019 (.NET desktop workload)
-- .NET Framework 4.7.2
+- Visual Studio 2022 (.NET desktop workload) or Jetbrains Rider 2025
+- .NET Standard 2.1
 
 ### How to build from source
 
 1. Download/clone this repository
-2. VisualStudio > File > Open solution > `SamSWAT.FireSupport.sln`
-3. Change references to your ones from EFT `Managed` folder
-4. VisualStudio > Build > Rebuild solution
-5. `SamSWAT.FireSupport.ArysReloaded.dll` should appear in `bin\Debug` directory
-6. Copy `SamSWAT.FireSupport.ArysReloaded.dll` into `mod/SamSWAT.FireSupport.ArysReloaded` folder
-7. Extract `assets.7z` with `here` option
-8. Delete archive after extraction
-9. Copy whole `SamSWAT.FireSupport.ArysReloaded` folder into `BepInEx/plugins/`
+2. VisualStudio > File > Open solution > `SamSWAT.FireSupport.ArysReloaded.sln`
+3. Open the project .csproj and `Directory.Build.props` in a text editor and change the paths to your liking
+4. Change assembly references to point to where you keep your assembly refs
+5. Extract `assets.7z` with `here` option
+6. Delete archive after extraction
+7. VisualStudio > Build > Rebuild solution
