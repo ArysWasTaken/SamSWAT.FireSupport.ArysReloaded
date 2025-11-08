@@ -27,13 +27,13 @@ public class GesturesMenuPatch : ModulePatch
 	[PatchPostfix]
 	private static async void PatchPostfix(GesturesMenu __instance)
 	{
-		if (!IsFireSupportAvailable())
-		{
-			return;
-		}
-
 		try
 		{
+			if (!IsFireSupportAvailable())
+			{
+				return;
+			}
+
 			var owner = Singleton<GameWorld>.Instance.MainPlayer.GetComponent<GamePlayerOwner>();
 			var fireSupportController = await FireSupportController.Create(__instance);
 			Traverse.Create(owner)

@@ -78,8 +78,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		await UniTask.WaitForSeconds(3f, cancellationToken: cancellationToken);
 		
 		// Play engine sound
-		engineSource.clip = GetRandomClip(engineSounds);
-		engineSource.outputAudioMixerGroup = _betterAudio.OutEnvironment;
+		engineSource.clip = engineSounds.GetRandomClip();
 		engineSource.Play();
 		await UniTask.WaitForSeconds(1f, cancellationToken: cancellationToken);
 		
@@ -106,7 +105,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		// TODO: This should be the sfx for the actual projectile instead of manually being played here
 		_betterAudio.PlayAtPoint(
 			strafePos,
-			GetRandomClip(gau8ExpSounds),
+			gau8ExpSounds.GetRandomClip(),
 			Vector3.Distance(_player.CameraPosition.position, strafePos),
 			BetterAudio.AudioSourceGroupType.Gunshots,
 			1200
@@ -122,7 +121,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		// Play GAU8 BRRRT sfx
 		_betterAudio.PlayAtPoint(
 			gau8Transform.position - gau8Transform.forward * 100 - gau8Transform.up * 100,
-			GetRandomClip(gau8Sound),
+			gau8Sound.GetRandomClip(),
 			Vector3.Distance(_player.CameraPosition.position, gau8Transform.position),
 			BetterAudio.AudioSourceGroupType.Gunshots,
 			3200,
@@ -162,11 +161,5 @@ public sealed class A10Behaviour : FireSupportBehaviour
 			ammoCounter--;
 			await UniTask.WaitForSeconds(_weapon.timeBetweenShots, cancellationToken: cancellationToken);
 		}
-	}
-	
-	private static AudioClip GetRandomClip(AudioClip[] audioClips)
-	{
-		int randomIndex = Random.Range(0, audioClips.Length);
-		return audioClips[randomIndex];
 	}
 }

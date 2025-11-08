@@ -64,16 +64,15 @@ public class FireSupportSpotter : ScriptableObject
 		
 		_spotterPositionObj.SetActive(true);
 		
-		while (!Input.GetMouseButtonDown(0))
+		while (!Input.GetMouseButtonDown(0) && !cancellationToken.IsCancellationRequested)
 		{
-			cancellationToken.ThrowIfCancellationRequested();
-			
 			if (IsRequestCancelled())
 			{
 				_requestCancelled = true;
 				_spotterPositionObj.SetActive(false);
 				FireSupportUI.Instance.SpotterNotice.SetActive(false);
 				FireSupportUI.Instance.SpotterHeliNotice.SetActive(false);
+				
 				return Vector3.zero;
 			}
 			
@@ -97,7 +96,7 @@ public class FireSupportSpotter : ScriptableObject
 			}
 			
 			_spotterPositionObj.transform.position = hitInfo.point;
-			await UniTask.NextFrame();
+			await UniTask.NextFrame(cancellationToken);
 		}
 		
 		if (_spotterPositionObj.transform.position.Equals(Vector3.zero) || checkSpace && _colliderCheckerObj.HasCollision)
