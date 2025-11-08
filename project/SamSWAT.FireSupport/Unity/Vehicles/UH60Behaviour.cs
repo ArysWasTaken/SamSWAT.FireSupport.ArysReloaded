@@ -46,7 +46,7 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	{
 		_gameWorld = Singleton<GameWorld>.Instance;
 		
-		AudioMixerGroup outputAudioMixerGroup = Singleton<BetterAudio>.Instance.OutEnvironment;
+		AudioMixerGroup outputAudioMixerGroup = Singleton<BetterAudio>.Instance.EnvTechnicalSoundsGroup;
 		engineCloseSource.outputAudioMixerGroup = outputAudioMixerGroup;
 		engineDistantSource.outputAudioMixerGroup = outputAudioMixerGroup;
 		rotorsCloseSource.outputAudioMixerGroup = outputAudioMixerGroup;

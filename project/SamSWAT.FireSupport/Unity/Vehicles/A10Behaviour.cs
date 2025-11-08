@@ -64,6 +64,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 	{
 		_fireSupportAudio = FireSupportAudio.Instance;
 		_betterAudio = Singleton<BetterAudio>.Instance;
+		engineSource.outputAudioMixerGroup = _betterAudio.EnvTechnicalSoundsGroup;
 		_gameWorld = Singleton<GameWorld>.Instance;
 		_player = _gameWorld.MainPlayer;
 		_weapon = new VehicleWeapon(_player.ProfileId, ItemConstants.GAU8_WEAPON_TPL, ItemConstants.GAU8_AMMO_TPL);
@@ -108,9 +109,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 			GetRandomClip(gau8ExpSounds),
 			Vector3.Distance(_player.CameraPosition.position, strafePos),
 			BetterAudio.AudioSourceGroupType.Gunshots,
-			1200,
-			1,
-			EOcclusionTest.Regular
+			1200
 		);
 		gau8Particles.SetActive(false);
 		await UniTask.WaitForSeconds(3.5f, cancellationToken: cancellationToken);
