@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using EFT;
 using JetBrains.Annotations;
 using SamSWAT.FireSupport.ArysReloaded.Utils;
+using System;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -39,7 +40,13 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	
 	public override void ManualUpdate()
 	{
-		CrossFadeAudio();
+		if (!PlayerHelper.IsMainPlayerAlive())
+		{
+			MarkForRemoval();
+			return;
+		}
+		
+		CrossFadeAudio(Singleton<GameWorld>.Instance.MainPlayer);
 	}
 	
 	protected override void OnAwake()
@@ -55,7 +62,7 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 		HasFinishedInitialization = true;
 	}
 	
-	private void CrossFadeAudio()
+	private void CrossFadeAudio(Player mainPlayer)
 	{
 		if (!_gameWorld.IsMainPlayerAlive())
 		{
