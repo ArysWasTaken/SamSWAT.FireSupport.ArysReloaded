@@ -27,6 +27,7 @@ x86/
 [Aa][Rr][Mm]64/
 bld/
 [Bb]in/
+[Bb]uild/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
@@ -365,8 +366,10 @@ MigrationBackup/
 # Editor-based HTTP Client requests
 /httpRequests/
 
-/mod/Exported/
-/WIP/
-**/.idea/
-**/build/
+dist/
+.config/
+global.json
+mod/Exported/
+WIP/
+.idea/
 *.bundle

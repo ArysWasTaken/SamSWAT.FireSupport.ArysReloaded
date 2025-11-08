@@ -1,0 +1,119 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>SamSWAT.FireSupport.ArysReloaded</RootNamespace>
+    <AssemblyName>SamSWAT.FireSupport.ArysReloaded.Core</AssemblyName>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Authors>SamSWAT, Arys</Authors>
+    <Copyright>Copyright © SamSWAT, Arys 2025</Copyright>
+    <Company />
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CopyToOutputDir>$(MSBuildThisFileDirectory)CopyToOutput</CopyToOutputDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SPT-3.10 Release|AnyCPU' ">
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SPT-3.11 Release|AnyCPU' ">
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SPT-4.0 Release|AnyCPU' ">
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="Comfort">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\Comfort.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Sirenix.Serialization">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\Sirenix.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="spt-reflection">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\spt-reflection.dll</HintPath>
+    </Reference>
+    <Reference Include="UniTask">
+      <HintPath>$(SptBepInExPluginsDir)UnityToolkit\UniTask.dll</HintPath>
+    </Reference>
+    <Reference Include="UniTask.Linq">
+      <HintPath>$(SptBepInExPluginsDir)UnityToolkit\UniTask.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIElementsModule">
+      <HintPath>$(SptSharedAssembliesDir)$(SptVersion)\UnityEngine.UIElementsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityToolkit">
+      <HintPath>$(SptBepInExPluginsDir)UnityToolkit\UnityToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="ZLinq">
+      <HintPath>$(SptBepInExPluginsDir)UnityToolkit\ZLinq.dll</HintPath>
+    </Reference>
+    <Reference Include="ZLinq.Unity">
+      <HintPath>$(SptBepInExPluginsDir)UnityToolkit\ZLinq.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="ZLinq.Unity.UnityCollectoins">
+      <HintPath>$(SptBepInExPluginsDir)UnityToolkit\ZLinq.Unity.UnityCollectoins.dll</HintPath>
+    </Reference>
+    <Reference Include="ZString">
+      <HintPath>$(SptBepInExPluginsDir)UnityToolkit\ZString.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove="global.json" />
+    <None Remove="build\**" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Remove="build\**" />
+    <EmbeddedResource Remove="build\**" />
+  </ItemGroup>
+  
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if not exist &quot;$(SptBepInExPluginsDir)$(SolutionName)&quot; (&#xA;    mkdir &quot;$(SptBepInExPluginsDir)$(SolutionName)&quot;&#xA;)&#xA;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(SptBepInExPluginsDir)$(SolutionName)\$(TargetFileName)&quot;&#xA;(robocopy &quot;$(CopyToOutputDir)&quot; &quot;$(SptBepInExPluginsDir)$(SolutionName)&quot; /E /XF .gitkeep) ^&amp; if %ERRORLEVEL% leq 3 exit 0" />
+  </Target>
+
+  <Target Name="CreateReleaseZip" AfterTargets="PostBuild">
+    <Exec Command="if not &quot;$(ConfigurationName)&quot;==&quot;Debug&quot; (&#xA;    cd /D &quot;$(SptBepInExPluginsDir)..\..\&quot;&#xA;    &quot;C:\Program Files\7-Zip\7z.exe&quot; a &quot;$(ReleaseArchive)&quot; &quot;BepInEx\plugins\$(SolutionName)\*&quot;&#xA;    &quot;C:\Program Files\7-Zip\7z.exe&quot; a &quot;$(ReleaseArchive)&quot; &quot;SPT\user\mods\$(SolutionName)\*&quot;&#xA;)" />
+  </Target>
+</Project>

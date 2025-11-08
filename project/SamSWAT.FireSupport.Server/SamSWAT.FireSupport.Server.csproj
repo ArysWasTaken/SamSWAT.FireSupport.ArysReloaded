@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>SamSWAT.FireSupport.ArysReloaded.Server</AssemblyName>
+    <RootNamespace>SamSWAT.FireSupport.ArysReloaded</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SPTarkov.Common" Version="4.0.3" />
+    <PackageReference Include="SPTarkov.DI" Version="4.0.3" />
+    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.3" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <CopyToOutputDir>$(MSBuildThisFileDirectory)CopyToOutput</CopyToOutputDir>
+  </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if not exist &quot;$(SptServerModsDir)$(SolutionName)&quot; (&#xA;    mkdir &quot;$(SptServerModsDir)$(SolutionName)&quot;&#xA;)&#xA;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(SptServerModsDir)$(SolutionName)\$(TargetFileName)&quot;&#xA;(robocopy &quot;$(CopyToOutputDir)&quot; &quot;$(SptServerModsDir)$(SolutionName)&quot; /E /XF .gitkeep) ^&amp; if %ERRORLEVEL% leq 3 exit 0" />
+  </Target>
+
+</Project>

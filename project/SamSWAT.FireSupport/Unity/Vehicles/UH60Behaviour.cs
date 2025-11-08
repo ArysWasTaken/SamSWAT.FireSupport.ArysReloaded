@@ -21,8 +21,9 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	public AudioSource engineDistantSource;
 	public AudioSource rotorsCloseSource;
 	public AudioSource rotorsDistantSource;
-
+	
 	private CancellationToken _cancellationToken;
+	private GameWorld _gameWorld;
 	
 	public override ESupportType SupportType => ESupportType.Extract;
 	
@@ -34,7 +35,7 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 		Transform heliTransform = transform;
 		heliTransform.position = position;
 		heliTransform.eulerAngles = rotation;
-		helicopterAnimator.SetFloat(s_flySpeedMultiplier, FireSupportPlugin.HelicopterSpeedMultiplier.Value);
+		helicopterAnimator.SetFloat(s_flySpeedMultiplier, PluginSettings.HelicopterSpeedMultiplier.Value);
 	}
 	
 	public override void ManualUpdate()
@@ -50,7 +51,9 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	
 	protected override void OnAwake()
 	{
-		AudioMixerGroup outputAudioMixerGroup = Singleton<BetterAudio>.Instance.OutEnvironment;
+		_gameWorld = Singleton<GameWorld>.Instance;
+		
+		AudioMixerGroup outputAudioMixerGroup = Singleton<BetterAudio>.Instance.EnvTechnicalSoundsGroup;
 		engineCloseSource.outputAudioMixerGroup = outputAudioMixerGroup;
 		engineDistantSource.outputAudioMixerGroup = outputAudioMixerGroup;
 		rotorsCloseSource.outputAudioMixerGroup = outputAudioMixerGroup;
@@ -61,7 +64,12 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	
 	private void CrossFadeAudio(Player mainPlayer)
 	{
-		float distance = Vector3.Distance(mainPlayer.CameraPosition.position, rotorsCloseSource.transform.position);
+		if (!_gameWorld.IsMainPlayerAlive())
+		{
+			return;
+		}
+		
+		float distance = Vector3.Distance(_gameWorld.MainPlayer.CameraPosition.position, rotorsCloseSource.transform.position);
 		float volume = volumeCurve.Evaluate(distance);
 		
 		rotorsCloseSource.volume = Mathf.Clamp01(volume);
@@ -73,29 +81,26 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	[UsedImplicitly]
 	private async UniTaskVoid OnHelicopterArrive()
 	{
-		try
-		{
-			FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliPickingUp);
-			GameObject extractionPoint = CreateExfilPoint();
-			float waitTime = FireSupportPlugin.HelicopterWaitTime.Value * 0.75f;
-			
-			await UniTask.WaitForSeconds(waitTime, cancellationToken: _cancellationToken);
-			
-			FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliHurry);
-			
-			await UniTask.WaitForSeconds(
-				duration: FireSupportPlugin.HelicopterWaitTime.Value - waitTime,
-				cancellationToken: _cancellationToken);
-			
-			helicopterAnimator.SetTrigger(s_flyAway);
-			Destroy(extractionPoint);
-			FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliLeavingNoPickup);
-		}
-		catch (OperationCanceledException) {}
-		catch (Exception ex)
-		{
-			FireSupportPlugin.LogSource.LogError(ex);
-		}
+		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliPickingUp);
+		GameObject extractionPoint = CreateExfilPoint();
+		float waitTime = PluginSettings.HelicopterWaitTime.Value * 0.75f;
+		
+		await UniTask.WaitForSeconds(waitTime, cancellationToken: _cancellationToken);
+		
+		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliHurry);
+		
+		await UniTask.WaitForSeconds(
+			duration: PluginSettings.HelicopterWaitTime.Value - waitTime,
+			cancellationToken: _cancellationToken);
+		
+		helicopterAnimator.SetTrigger(s_flyAway);
+		Destroy(extractionPoint);
+		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliLeavingNoPickup);
+	}
+	
+	private async UniTask WaitForHelicopterLanding(CancellationToken cancellationToken)
+	{
+		
 	}
 	
 	[UsedImplicitly]

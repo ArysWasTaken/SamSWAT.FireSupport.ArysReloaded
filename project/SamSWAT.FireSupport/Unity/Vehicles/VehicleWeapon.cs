@@ -40,8 +40,8 @@ public class VehicleWeapon
 	public void FireProjectile(Vector3 origin, Vector3 direction)
 	{
 		// fireIndex seems to be related to player statistics - counting the number of shots player has fired
-		// Leave fireIndex at 0 because we don't want vehicle weapon shots inflating player statistics
-		EftBulletClass bullet = _ballisticsCalculator.CreateShot(_ammoItem, origin, direction, 0, _playerProfileId,
+		// Leave fireIndex at -1 because we don't want vehicle weapon shots inflating player statistics
+		EftBulletClass bullet = _ballisticsCalculator.CreateShot(_ammoItem, origin, direction, -1, _playerProfileId,
 			_weapon, _weapon.SpeedFactor);
 		_ballisticsCalculator.Shoot(bullet);
 	}

@@ -14,6 +14,12 @@ public abstract class UpdatableComponentBase : ComponentBase
 	/// <summary>
 	/// Check if the component has been marked for removal from the update loop.
 	/// </summary>
+	public static bool IsMarkedForRemoval(UpdatableComponentBase component)
+	{
+		return component._markedForRemoval;
+	}
+	
+	/// <inheritdoc cref="IsMarkedForRemoval(SamSWAT.FireSupport.ArysReloaded.Unity.UpdatableComponentBase)"/>
 	public bool IsMarkedForRemoval()
 	{
 		return _markedForRemoval;

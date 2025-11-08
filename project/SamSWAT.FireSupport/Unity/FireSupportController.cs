@@ -15,7 +15,6 @@ namespace SamSWAT.FireSupport.ArysReloaded.Unity;
 /// </summary>
 public class FireSupportController : UIInputNode
 {
-	[NonSerialized] private CancellationTokenSource _cancellationTokenSource;
 	[NonSerialized] private FireSupportAudio _audio;
 	[NonSerialized] private FireSupportUI _ui;
 	[NonSerialized] private FireSupportSpotter _spotter;
@@ -34,21 +33,18 @@ public class FireSupportController : UIInputNode
 	
 	private async UniTask Initialize(GesturesMenu gesturesMenu)
 	{
-		_cancellationTokenSource = new CancellationTokenSource();
 		_gesturesMenu = gesturesMenu;
 		_audio = await FireSupportAudio.Create();
 		_spotter = await FireSupportSpotter.Load();
 		
 		var heliExfil = new HeliExfiltrationService(
 			_spotter,
-			_cancellationTokenSource.Token,
-			FireSupportPlugin.AmountOfExtractionRequests.Value);
+			PluginSettings.AmountOfExtractionRequests.Value);
 		_services.Add(heliExfil.SupportType, heliExfil);
 		
 		var jetStrafe = new JetStrafeService(
 			_spotter,
-			_cancellationTokenSource.Token,
-			FireSupportPlugin.AmountOfStrafeRequests.Value);
+			PluginSettings.AmountOfStrafeRequests.Value);
 		_services.Add(jetStrafe.SupportType, jetStrafe);
 		
 		_ui = await FireSupportUI.Load(_services, gesturesMenu);
@@ -62,8 +58,6 @@ public class FireSupportController : UIInputNode
 	private void OnDestroy()
 	{
 		_ui.SupportRequested -= OnSupportRequested;
-		_cancellationTokenSource.Cancel();
-		_cancellationTokenSource.Dispose();
 		AssetLoader.UnloadAllBundles();
 	}
 	
@@ -83,7 +77,7 @@ public class FireSupportController : UIInputNode
 			}
 			
 			_gesturesMenu.Close();
-			service.PlanRequest().Forget();
+			service.PlanRequest(destroyCancellationToken).Forget();
 		}
 		catch (OperationCanceledException) {}
 		catch (Exception ex)
@@ -94,36 +88,44 @@ public class FireSupportController : UIInputNode
 	
 	public async UniTaskVoid StartCooldown(float time, CancellationToken cancellationToken, Action callback = null)
 	{
-		_ui.timerText.enabled = true;
-		
-		while (time > 0)
+		try
 		{
-			time -= Time.deltaTime;
-			if (time < 0)
+			_ui.timerText.enabled = true;
+			
+			while (time > 0)
 			{
-				time = 0;
+				time--;
+				if (time < 0)
+				{
+					time = 0;
+				}
+				
+				float minutes = Mathf.FloorToInt(time / 60);
+				float seconds = Mathf.FloorToInt(time % 60);
+				
+				using (Utf16ValueStringBuilder sb = ZString.CreateStringBuilder())
+				{
+					sb.AppendFormat("{0:00}.{1:00}", minutes, seconds);
+					_ui.timerText.text = sb.ToString();
+				}
+				
+				await UniTask.WaitForSeconds(1, cancellationToken: cancellationToken);
 			}
 			
-			float minutes = Mathf.FloorToInt(time / 60);
-			float seconds = Mathf.FloorToInt(time % 60);
+			_ui.timerText.enabled = false;
 			
-			using (Utf16ValueStringBuilder sb = ZString.CreateStringBuilder())
+			if (_services.AnyAvailableRequests())
 			{
-				sb.AppendFormat("{0:00}.{1:00}", minutes, seconds);
-				_ui.timerText.text = sb.ToString();
+				FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.StationAvailable);
 			}
 			
-			await UniTask.NextFrame(cancellationToken);
+			callback?.Invoke();
 		}
-		
-		_ui.timerText.enabled = false;
-		
-		if (_services.AnyAvailableRequests())
+		catch (OperationCanceledException) {}
+		catch (Exception ex)
 		{
-			FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.StationAvailable);
+			FireSupportPlugin.LogSource.LogError(ex);
 		}
-		
-		callback?.Invoke();
 	}
 	
 	public override ETranslateResult TranslateCommand(ECommand command)

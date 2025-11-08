@@ -1,20 +1,17 @@
-using Comfort.Common;
 using EFT;
-using UnityToolkit.Extensions;
+using System.Runtime.CompilerServices;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Utils;
 
 internal static class PlayerHelper
 {
-	public static bool IsMainPlayerAlive()
+	/// <summary>
+	/// Checks if the main player is alive.
+	/// </summary>
+	/// <returns>True if alive, otherwise false.</returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static bool IsMainPlayerAlive(this GameWorld gameWorld)
 	{
-		GameWorld gameWorld = Singleton<GameWorld>.Instance;
-		if (gameWorld == null)
-		{
-			return false;
-		}
-		
-		Player player = gameWorld.MainPlayer;
-		return player.OrNull()?.ActiveHealthController.IsAlive == true;
+		return gameWorld.MainPlayer != null && gameWorld.MainPlayer.ActiveHealthController.IsAlive;
 	}
 }

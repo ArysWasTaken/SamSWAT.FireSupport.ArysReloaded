@@ -1,1 +1,1 @@
-global using ISessionStopper = CommonAssets.Scripts.Game.EndByExitTrigerScenario.GInterface129;
+global using ISessionStopper = CommonAssets.Scripts.Game.EndByExitTrigerScenario.GInterface146;

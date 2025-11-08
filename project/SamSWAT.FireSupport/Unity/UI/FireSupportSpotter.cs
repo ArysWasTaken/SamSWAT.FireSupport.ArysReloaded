@@ -42,8 +42,7 @@ public class FireSupportSpotter : ScriptableObject
 	{
 		_inputManager = InputManagerUtil.GetInputManager().gameObject;
 		_player = Singleton<GameWorld>.Instance.MainPlayer;
-		//_layerMask = LayerMask.GetMask("Terrain", "LowPolyCollider");
-		_layerMask = 1 << LayerMask.NameToLayer("Terrain") | 1 << LayerMask.NameToLayer("LowPolyCollider");
+		_layerMask = LayerMaskClass.TerrainLowPoly;
 		
 		_spotterPositionObj = Instantiate(spotterParticles[0]);
 		_colliderCheckerObj = _spotterPositionObj.GetComponentInChildren<ColliderReporter>();
@@ -65,16 +64,15 @@ public class FireSupportSpotter : ScriptableObject
 		
 		_spotterPositionObj.SetActive(true);
 		
-		while (!Input.GetMouseButtonDown(0))
+		while (!Input.GetMouseButtonDown(0) && !cancellationToken.IsCancellationRequested)
 		{
-			cancellationToken.ThrowIfCancellationRequested();
-			
 			if (IsRequestCancelled())
 			{
 				_requestCancelled = true;
 				_spotterPositionObj.SetActive(false);
 				FireSupportUI.Instance.SpotterNotice.SetActive(false);
 				FireSupportUI.Instance.SpotterHeliNotice.SetActive(false);
+				
 				return Vector3.zero;
 			}
 			
@@ -98,7 +96,7 @@ public class FireSupportSpotter : ScriptableObject
 			}
 			
 			_spotterPositionObj.transform.position = hitInfo.point;
-			await UniTask.NextFrame();
+			await UniTask.NextFrame(cancellationToken);
 		}
 		
 		if (_spotterPositionObj.transform.position.Equals(Vector3.zero) || checkSpace && _colliderCheckerObj.HasCollision)
@@ -127,10 +125,8 @@ public class FireSupportSpotter : ScriptableObject
 		_spotterRotationObj.SetActive(true);
 		_inputManager.SetActive(false);
 		
-		while (!Input.GetMouseButtonDown(0))
+		while (!Input.GetMouseButtonDown(0) && !cancellationToken.IsCancellationRequested)
 		{
-			cancellationToken.ThrowIfCancellationRequested();
-			
 			if (IsRequestCancelled())
 			{
 				_requestCancelled = true;
@@ -142,7 +138,7 @@ public class FireSupportSpotter : ScriptableObject
 			float xAxisRotation = Input.GetAxis("Mouse X") * 5;
 			_spotterRotationObj.transform.Rotate(Vector3.down, xAxisRotation);
 			
-			await UniTask.NextFrame();
+			await UniTask.NextFrame(cancellationToken);
 		}
 		
 		_inputManager.SetActive(true);

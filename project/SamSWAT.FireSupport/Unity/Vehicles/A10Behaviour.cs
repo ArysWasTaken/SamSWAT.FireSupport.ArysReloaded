@@ -25,8 +25,13 @@ public sealed class A10Behaviour : FireSupportBehaviour
 	private FireSupportAudio _fireSupportAudio;
 	
 	private VehicleWeapon _weapon;
+	private GameWorld _gameWorld;
 	private Player _player;
-	
+
+	private const float TOP_SPEED = 180f;
+	private const float STRAFE_SPEED = 150f;
+	private float _currentSpeed = STRAFE_SPEED;
+
 	public override ESupportType SupportType => ESupportType.Strafe;
 	
 	public override void ProcessRequest(
@@ -56,14 +61,16 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		Transform t = transform;
 		_flareCountermeasureInstance.transform.position = t.position - t.forward * 6.5f;
 		_flareCountermeasureInstance.transform.eulerAngles = new Vector3(90, t.eulerAngles.y, 0);
-		transform.Translate(0, 0, 148 * Time.deltaTime, Space.Self);
+		transform.Translate(0, 0, _currentSpeed * Time.deltaTime, Space.Self);
 	}
 	
 	protected override void OnAwake()
 	{
 		_fireSupportAudio = FireSupportAudio.Instance;
 		_betterAudio = Singleton<BetterAudio>.Instance;
-		_player = Singleton<GameWorld>.Instance.MainPlayer;
+		engineSource.outputAudioMixerGroup = _betterAudio.EnvTechnicalSoundsGroup;
+		_gameWorld = Singleton<GameWorld>.Instance;
+		_player = _gameWorld.MainPlayer;
 		_weapon = new VehicleWeapon(_player.ProfileId, ItemConstants.GAU8_WEAPON_TPL, ItemConstants.GAU8_AMMO_TPL);
 		
 		HasFinishedInitialization = true;
@@ -75,8 +82,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		await UniTask.WaitForSeconds(3f, cancellationToken: cancellationToken);
 		
 		// Play engine sound
-		engineSource.clip = GetRandomClip(engineSounds);
-		engineSource.outputAudioMixerGroup = _betterAudio.OutEnvironment;
+		engineSource.clip = engineSounds.GetRandomClip();
 		engineSource.Play();
 		await UniTask.WaitForSeconds(1f, cancellationToken: cancellationToken);
 		
@@ -92,28 +98,29 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		
 		// Fire GAU8
 		Gau8Sequence(strafePos, cancellationToken).Forget();
-		await UniTask.WaitForSeconds(2f, cancellationToken: cancellationToken);
-		
-		if (!PlayerHelper.IsMainPlayerAlive())
+
+		if (!_gameWorld.IsMainPlayerAlive())
 		{
 			return;
 		}
+
+		float distanceFromPlayer = Vector3.Distance(_player.CameraPosition.position, strafePos);
+		const float soundSpeedMS = 343;
+		await UniTask.WaitForSeconds(distanceFromPlayer / soundSpeedMS, cancellationToken: cancellationToken);
 		
 		// Play explosion sfx
 		// TODO: This should be the sfx for the actual projectile instead of manually being played here
 		_betterAudio.PlayAtPoint(
 			strafePos,
-			GetRandomClip(gau8ExpSounds),
-			Vector3.Distance(_player.CameraPosition.position, strafePos),
+			gau8ExpSounds.GetRandomClip(),
+			distanceFromPlayer,
 			BetterAudio.AudioSourceGroupType.Gunshots,
-			1200,
-			1,
-			EOcclusionTest.Regular
+			1200
 		);
 		gau8Particles.SetActive(false);
 		await UniTask.WaitForSeconds(3.5f, cancellationToken: cancellationToken);
 		
-		if (!PlayerHelper.IsMainPlayerAlive())
+		if (!_gameWorld.IsMainPlayerAlive())
 		{
 			return;
 		}
@@ -121,7 +128,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		// Play GAU8 BRRRT sfx
 		_betterAudio.PlayAtPoint(
 			gau8Transform.position - gau8Transform.forward * 100 - gau8Transform.up * 100,
-			GetRandomClip(gau8Sound),
+			gau8Sound.GetRandomClip(),
 			Vector3.Distance(_player.CameraPosition.position, gau8Transform.position),
 			BetterAudio.AudioSourceGroupType.Gunshots,
 			3200,
@@ -151,13 +158,8 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		Vector3 gau8LeftDir = Vector3.Cross(gau8Dir, Vector3.up).normalized;
 		
 		var ammoCounter = 50;
-		while (ammoCounter > 0)
+		while (!cancellationToken.IsCancellationRequested && ammoCounter > 0 && _gameWorld.IsMainPlayerAlive())
 		{
-			if (!PlayerHelper.IsMainPlayerAlive())
-			{
-				break;
-			}
-			
 			Vector3 leftRightSpread = gau8LeftDir * Random.Range(-0.007f, 0.007f);
 			gau8Dir = Vector3.Normalize(gau8Dir + new Vector3(0, 0.00037f, 0));
 			Vector3 projectileDir = Vector3.Normalize(gau8Dir + leftRightSpread);
@@ -166,11 +168,18 @@ public sealed class A10Behaviour : FireSupportBehaviour
 			ammoCounter--;
 			await UniTask.WaitForSeconds(_weapon.timeBetweenShots, cancellationToken: cancellationToken);
 		}
+
+		AccelerateSequence(cancellationToken).Forget();
 	}
-	
-	private static AudioClip GetRandomClip(AudioClip[] audioClips)
+
+	private async UniTaskVoid AccelerateSequence(CancellationToken cancellationToken)
 	{
-		int randomIndex = Random.Range(0, audioClips.Length);
-		return audioClips[randomIndex];
+		const float acceleration = 5.38f;
+		
+		while (!cancellationToken.IsCancellationRequested && _currentSpeed < TOP_SPEED)
+		{
+			await UniTask.NextFrame(PlayerLoopTiming.Update, cancellationToken);
+			_currentSpeed += acceleration * Time.deltaTime;
+		}
 	}
 }

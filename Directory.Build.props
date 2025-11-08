@@ -1,0 +1,90 @@
+<Project>
+  <PropertyGroup>
+    <Version>2.3.0</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
+    <TargetSptVersion>4.0.3</TargetSptVersion>
+    <Authors>Arys</Authors>
+    <Copyright>Arys</Copyright>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;SPT-3.10 Release;SPT-3.11 Release;SPT-4.0 Release</Configurations>
+    <Platforms>AnyCPU</Platforms>
+    <SolutionName>SamSWAT.FireSupport.ArysReloaded</SolutionName>
+    <DistributionDir>$(MSBuildThisFileDirectory)dist\</DistributionDir>
+    <ReleaseArchive>$(DistributionDir)$(SolutionName)-v$(Version)-SPT$(TargetSptVersion).7z</ReleaseArchive>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- Your SPT path -->
+    <SptDir>F:\SPT-4.0\</SptDir>
+
+    <!--
+      This is the path to where all your different SPT versions' assemblies are stored.
+      For example, my SPT Assemblies folder is laid out like so:
+        SPT Assemblies
+        ↳ 38x
+          ↳ ..
+          ↳ Assembly-CSharp.dll
+        ↳ 39x
+        ↳ 310x
+        ↳ 311x
+    -->
+    <SptSharedAssembliesDir>..\..\..\..\SPT Assemblies\</SptSharedAssembliesDir>
+
+    <!--
+      The SPT version to target.
+      This is used to find the corresponding SPT version's assembles in <SptSharedAssembliesDir>.
+      The value here is mostly a fallback value if you do not have a build configuration set up yet.
+    -->
+    <SptVersion Condition=" '$(SptVersion)' == '' ">400x</SptVersion>
+    <SptBepInExPluginsDir>$(SptDir)BepInEx\plugins\</SptBepInExPluginsDir>
+    <SptBepInExPatchersDir>$(SptDir)BepInEx\patchers\</SptBepInExPatchersDir>
+    <SptServerModsDir>$(SptDir)SPT\user\mods\</SptServerModsDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>Build\Debug\</OutputPath>
+    <Optimize>false</Optimize>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702;0649</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SPT-3.10 Release|AnyCPU' ">
+    <OutputPath>Build\SPT-3.10\</OutputPath>
+    <SptVersion>310x</SptVersion>
+    <Optimize>true</Optimize>
+    <NoWarn>1701;1702;0649</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SPT-3.11 Release|AnyCPU' ">
+    <OutputPath>Build\SPT-3.11\</OutputPath>
+    <SptVersion>311x</SptVersion>
+    <Optimize>true</Optimize>
+    <NoWarn>1701;1702;0649</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'SPT-4.0 Release|AnyCPU' ">
+    <OutputPath>Build\SPT-4.0\</OutputPath>
+    <SptVersion>400x</SptVersion>
+    <Optimize>true</Optimize>
+    <NoWarn>1701;1702;0649</NoWarn>
+  </PropertyGroup>
+
+  <Target Name="GenerateModMetadata" BeforeTargets="BeforeCompile" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)ModMetadata.cs">
+    <ItemGroup>
+      <ModMetadataFilePath Include="$(IntermediateOutputPath)ModMetadata.cs" />
+      <GeneratedText Include="// -- Auto-generated at build time --" />
+      <GeneratedText Include="// --------- DO NOT MODIFY ----------" />
+      <GeneratedText Include="%23pragma warning disable CS1591 // Missing XML comment for publicly visible type or member" />
+      <GeneratedText Include="namespace $(RootNamespace)%3B" />
+      <GeneratedText Include="internal static class ModMetadata" />
+      <GeneratedText Include="%7B" />
+      <GeneratedText Include='%09public const string VERSION = "$(Version)"%3B' />
+      <GeneratedText Include='%09public const string TARGET_SPT_VERSION = "$(TargetSptVersion)"%3B' />
+      <GeneratedText Include="%7D" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="@(ModMetadataFilePath)" />
+    </ItemGroup>
+    <WriteLinesToFile File="@(ModMetadataFilePath)" Lines="@(GeneratedText)" Overwrite="true" />
+  </Target>
+</Project>
