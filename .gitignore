@@ -366,6 +366,7 @@ MigrationBackup/
 # Editor-based HTTP Client requests
 /httpRequests/
 
+dist/
 .config/
 global.json
 mod/Exported/
