@@ -27,7 +27,11 @@ public sealed class A10Behaviour : FireSupportBehaviour
 	private VehicleWeapon _weapon;
 	private GameWorld _gameWorld;
 	private Player _player;
-	
+
+	private const float TOP_SPEED = 180f;
+	private const float STRAFE_SPEED = 150f;
+	private float _currentSpeed = STRAFE_SPEED;
+
 	public override ESupportType SupportType => ESupportType.Strafe;
 	
 	public override void ProcessRequest(
@@ -57,7 +61,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		Transform t = transform;
 		_flareCountermeasureInstance.transform.position = t.position - t.forward * 6.5f;
 		_flareCountermeasureInstance.transform.eulerAngles = new Vector3(90, t.eulerAngles.y, 0);
-		transform.Translate(0, 0, 148 * Time.deltaTime, Space.Self);
+		transform.Translate(0, 0, _currentSpeed * Time.deltaTime, Space.Self);
 	}
 	
 	protected override void OnAwake()
@@ -154,7 +158,7 @@ public sealed class A10Behaviour : FireSupportBehaviour
 		Vector3 gau8LeftDir = Vector3.Cross(gau8Dir, Vector3.up).normalized;
 		
 		var ammoCounter = 50;
-		while (ammoCounter > 0 && _gameWorld.IsMainPlayerAlive())
+		while (!cancellationToken.IsCancellationRequested && ammoCounter > 0 && _gameWorld.IsMainPlayerAlive())
 		{
 			Vector3 leftRightSpread = gau8LeftDir * Random.Range(-0.007f, 0.007f);
 			gau8Dir = Vector3.Normalize(gau8Dir + new Vector3(0, 0.00037f, 0));
@@ -163,6 +167,19 @@ public sealed class A10Behaviour : FireSupportBehaviour
 			_weapon.FireProjectile(gau8Pos, projectileDir);
 			ammoCounter--;
 			await UniTask.WaitForSeconds(_weapon.timeBetweenShots, cancellationToken: cancellationToken);
+		}
+
+		AccelerateSequence(cancellationToken).Forget();
+	}
+
+	private async UniTaskVoid AccelerateSequence(CancellationToken cancellationToken)
+	{
+		const float acceleration = 5.38f;
+		
+		while (!cancellationToken.IsCancellationRequested && _currentSpeed < TOP_SPEED)
+		{
+			await UniTask.NextFrame(PlayerLoopTiming.Update, cancellationToken);
+			_currentSpeed += acceleration * Time.deltaTime;
 		}
 	}
 }
