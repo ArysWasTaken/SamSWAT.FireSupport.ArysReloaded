@@ -7,7 +7,7 @@ public interface IFireSupportService
 {
 	public ESupportType SupportType { get; }
 	public int AvailableRequests { get; }
-	
+
 	public bool IsRequestAvailable();
 	public UniTaskVoid PlanRequest(CancellationToken cancellationToken);
 }

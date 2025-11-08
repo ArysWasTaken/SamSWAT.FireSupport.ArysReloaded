@@ -9,19 +9,23 @@ public abstract class ComponentBase : MonoBehaviour
 		useGUILayout = false;
 		OnAwake();
 	}
-	
+
 	protected virtual void Start()
 	{
 		OnStart();
 	}
-	
+
 	/// <summary>
 	/// Use this method to initialize data within the Unity Awake event function.
 	/// </summary>
-	protected virtual void OnAwake() {}
-	
+	protected virtual void OnAwake()
+	{
+	}
+
 	/// <summary>
 	/// Use this method to initialize data within the Unity Start event function.
 	/// </summary>
-	protected virtual void OnStart() {}
+	protected virtual void OnStart()
+	{
+	}
 }

@@ -8,9 +8,9 @@ public class ColliderReporter : UpdatableComponentBase
 	private BoxCollider[] _colliders;
 	private Collider[] _intersectedColliders;
 	private int _mask;
-	
+
 	public bool HasCollision => _hasCollision;
-	
+
 	public override void ManualUpdate()
 	{
 		foreach (BoxCollider col in _colliders)
@@ -19,7 +19,7 @@ public class ColliderReporter : UpdatableComponentBase
 			Quaternion colRotation = colTransform.rotation;
 			Vector3 center = colTransform.position + colRotation * col.center;
 			Vector3 extents = Vector3.Scale(col.size * 0.5f, colTransform.lossyScale);
-			
+
 			int hits = Physics.OverlapBoxNonAlloc(
 				center,
 				extents,
@@ -27,23 +27,23 @@ public class ColliderReporter : UpdatableComponentBase
 				colRotation,
 				_mask,
 				QueryTriggerInteraction.Ignore);
-			
+
 			if (hits > 0)
 			{
 				_hasCollision = true;
 				break;
 			}
-			
+
 			_hasCollision = false;
 		}
 	}
-	
+
 	protected override void OnAwake()
 	{
 		_intersectedColliders = new Collider[5];
 		_colliders = GetComponents<BoxCollider>();
 		_mask = LayerMaskClass.LowPolyColliderLayerMask | LayerMaskClass.HighPolyCollider;
-		
+
 		HasFinishedInitialization = true;
 	}
 }

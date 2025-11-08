@@ -11,22 +11,22 @@ public class SimpleSpinBlur : UpdatableComponentBase
 	private Mesh _ssbMesh;
 	private Material _ssbMaterial;
 	private Queue<Quaternion> rotationQueue = new();
-	
+
 	[Range(1, 128)] [Tooltip("Motion Blur Amount")]
 	public int shutterSpeed = 4;
-	
+
 	[Range(1, 50)] [Tooltip("Motion Blur Samples")]
 	public int samples = 8;
-	
+
 	[Range(-0.1f, 0.1f)] [Tooltip("Motion Blur Opacity")]
 	public float alphaOffset;
-	
+
 	[Tooltip("[Optimization] Enables material's GPU Instancing property")]
 	public bool enableGPUInstancing;
-	
+
 	[Tooltip("[Optimization] Angular velocity threshold value before which the effects will not be rendered.")]
 	public float angularVelocityCutoff;
-	
+
 	public override void ManualUpdate()
 	{
 		if (rotationQueue.Count >= shutterSpeed)
@@ -38,7 +38,7 @@ public class SimpleSpinBlur : UpdatableComponentBase
 				rotationQueue.Dequeue();
 			}
 		}
-		
+
 		rotationQueue.Enqueue(transform.rotation);
 		if (Quaternion.Angle(transform.rotation, rotationQueue.Peek()) / shutterSpeed >= angularVelocityCutoff)
 		{
@@ -49,7 +49,7 @@ public class SimpleSpinBlur : UpdatableComponentBase
 					transform.position,
 					Quaternion.Lerp(
 						rotationQueue.Peek(),
-						transform.rotation, i / (float) samples
+						transform.rotation, i / (float)samples
 					),
 					_ssbMaterial,
 					0,
@@ -57,12 +57,12 @@ public class SimpleSpinBlur : UpdatableComponentBase
 					0
 				);
 			}
-			
+
 			var tempColor = new Color(
 				_ssbMaterial.color.r,
 				_ssbMaterial.color.g,
 				_ssbMaterial.color.b,
-				Mathf.Abs((2 / (float) samples) + alphaOffset
+				Mathf.Abs((2 / (float)samples) + alphaOffset
 				));
 			_ssbMaterial.color = tempColor;
 		}
@@ -73,13 +73,13 @@ public class SimpleSpinBlur : UpdatableComponentBase
 			_ssbMaterial.color = tempColor;
 		}
 	}
-	
+
 	protected override void OnStart()
 	{
 		_ssbMesh = GetComponent<MeshFilter>().mesh;
 		_ssbMaterial = GetComponent<MeshRenderer>().sharedMaterial;
 		_ssbMaterial.enableInstancing = enableGPUInstancing;
-		
+
 		HasFinishedInitialization = true;
 	}
 }

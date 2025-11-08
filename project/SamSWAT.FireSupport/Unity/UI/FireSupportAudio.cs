@@ -26,15 +26,15 @@ public class FireSupportAudio : ScriptableObject
 	[SerializeField] private AudioClip[] supportHeliLeaving;
 	[SerializeField] private AudioClip[] supportHeliLeavingAfterPickup;
 	[SerializeField] private AudioClip[] supportHeliLeavingNoPickup;
-	
+
 	public static FireSupportAudio Instance { get; private set; }
-	
+
 	public static async UniTask<FireSupportAudio> Create()
 	{
 		Instance = await AssetLoader.LoadAssetAsync<FireSupportAudio>("assets/content/ui/firesupport_audio.bundle");
 		return Instance;
 	}
-	
+
 	public void PlayVoiceover(EVoiceoverType voiceoverType)
 	{
 		AudioClip voAudioClip = voiceoverType switch

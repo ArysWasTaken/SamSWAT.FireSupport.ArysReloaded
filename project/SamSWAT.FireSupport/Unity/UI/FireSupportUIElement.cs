@@ -11,7 +11,7 @@ public class FireSupportUIElement : ComponentBase
 	public Sprite SelectedSubColor;
 	public Text AmountText;
 	private bool _isUnderPointer;
-	
+
 	public bool IsUnderPointer
 	{
 		set
@@ -21,7 +21,7 @@ public class FireSupportUIElement : ComponentBase
 			UnderPointerChanged(_isUnderPointer);
 		}
 	}
-	
+
 	protected void UnderPointerChanged(bool isUnderPointer)
 	{
 		BackgroundImage.sprite = isUnderPointer ? SelectedSubColor : DefaultSubColor;

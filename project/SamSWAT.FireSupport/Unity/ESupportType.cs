@@ -15,7 +15,7 @@ public class SupportTypeComparer : IEqualityComparer<ESupportType>
 	{
 		return x == y;
 	}
-	
+
 	public int GetHashCode(ESupportType obj)
 	{
 		return (int)obj;

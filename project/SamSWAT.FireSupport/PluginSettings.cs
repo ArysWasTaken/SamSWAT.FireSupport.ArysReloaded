@@ -12,7 +12,7 @@ internal static class PluginSettings
 	internal static ConfigEntry<float> HelicopterSpeedMultiplier { get; private set; }
 	internal static ConfigEntry<int> RequestCooldown { get; private set; }
 	internal static ConfigEntry<int> VoiceoverVolume { get; private set; }
-	
+
 	internal static void Initialize(ConfigFile config)
 	{
 		Enabled = config.Bind(
@@ -20,7 +20,7 @@ internal static class PluginSettings
 			"Plugin state",
 			true,
 			new ConfigDescription("Enables/disables plugin"));
-		
+
 		AmountOfStrafeRequests = config.Bind(
 			"Main Settings",
 			"Amount of autocannon strafe requests",
@@ -39,7 +39,7 @@ internal static class PluginSettings
 			300,
 			new ConfigDescription("Seconds",
 				new AcceptableValueRange<int>(60, 3600)));
-		
+
 		HelicopterWaitTime = config.Bind(
 			"Helicopter Extraction Settings",
 			"Helicopter wait time",
@@ -58,7 +58,7 @@ internal static class PluginSettings
 			1f,
 			new ConfigDescription("How fast the helicopter arrival animation will be played",
 				new AcceptableValueRange<float>(0.8f, 1.5f)));
-		
+
 		VoiceoverVolume = config.Bind(
 			"Sound Settings",
 			"Voiceover volume",

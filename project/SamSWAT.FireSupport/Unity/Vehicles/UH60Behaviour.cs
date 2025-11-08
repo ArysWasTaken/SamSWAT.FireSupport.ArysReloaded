@@ -14,102 +14,102 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 {
 	private static readonly int s_flySpeedMultiplier = Animator.StringToHash("FlySpeedMultiplier");
 	private static readonly int s_flyAway = Animator.StringToHash("FlyAway");
-	
+
 	[SerializeField] private Animator helicopterAnimator;
 	[SerializeField] private AnimationCurve volumeCurve;
 	public AudioSource engineCloseSource;
 	public AudioSource engineDistantSource;
 	public AudioSource rotorsCloseSource;
 	public AudioSource rotorsDistantSource;
-	
+
 	private CancellationToken _cancellationToken;
 	private GameWorld _gameWorld;
-	
+
 	public override ESupportType SupportType => ESupportType.Extract;
-	
+
 	public override void ProcessRequest(Vector3 position, Vector3 direction, Vector3 rotation,
 		CancellationToken cancellationToken)
 	{
 		_cancellationToken = cancellationToken;
-		
+
 		Transform heliTransform = transform;
 		heliTransform.position = position;
 		heliTransform.eulerAngles = rotation;
 		helicopterAnimator.SetFloat(s_flySpeedMultiplier, PluginSettings.HelicopterSpeedMultiplier.Value);
 	}
-	
+
 	public override void ManualUpdate()
 	{
-		if (!PlayerHelper.IsMainPlayerAlive())
+		if (!_gameWorld.IsMainPlayerAlive())
 		{
 			MarkForRemoval();
 			return;
 		}
-		
-		CrossFadeAudio(Singleton<GameWorld>.Instance.MainPlayer);
+
+		CrossFadeAudio();
 	}
-	
+
 	protected override void OnAwake()
 	{
 		_gameWorld = Singleton<GameWorld>.Instance;
-		
+
 		AudioMixerGroup outputAudioMixerGroup = Singleton<BetterAudio>.Instance.EnvTechnicalSoundsGroup;
 		engineCloseSource.outputAudioMixerGroup = outputAudioMixerGroup;
 		engineDistantSource.outputAudioMixerGroup = outputAudioMixerGroup;
 		rotorsCloseSource.outputAudioMixerGroup = outputAudioMixerGroup;
 		rotorsDistantSource.outputAudioMixerGroup = outputAudioMixerGroup;
-		
+
 		HasFinishedInitialization = true;
 	}
-	
-	private void CrossFadeAudio(Player mainPlayer)
+
+	private void CrossFadeAudio()
 	{
 		if (!_gameWorld.IsMainPlayerAlive())
 		{
 			return;
 		}
-		
-		float distance = Vector3.Distance(_gameWorld.MainPlayer.CameraPosition.position, rotorsCloseSource.transform.position);
+
+		float distance = Vector3.Distance(_gameWorld.MainPlayer.CameraPosition.position,
+			rotorsCloseSource.transform.position);
 		float volume = volumeCurve.Evaluate(distance);
-		
+
 		rotorsCloseSource.volume = Mathf.Clamp01(volume);
 		engineCloseSource.volume = Mathf.Clamp01(volume - 0.2f);
 		rotorsDistantSource.volume = Mathf.Clamp01(1 - volume);
 		engineDistantSource.volume = Mathf.Clamp01(1 - volume);
 	}
-	
+
 	[UsedImplicitly]
 	private async UniTaskVoid OnHelicopterArrive()
 	{
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliPickingUp);
 		GameObject extractionPoint = CreateExfilPoint();
 		float waitTime = PluginSettings.HelicopterWaitTime.Value * 0.75f;
-		
+
 		await UniTask.WaitForSeconds(waitTime, cancellationToken: _cancellationToken);
-		
+
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliHurry);
-		
+
 		await UniTask.WaitForSeconds(
 			duration: PluginSettings.HelicopterWaitTime.Value - waitTime,
 			cancellationToken: _cancellationToken);
-		
+
 		helicopterAnimator.SetTrigger(s_flyAway);
 		Destroy(extractionPoint);
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliLeavingNoPickup);
 	}
-	
+
 	private async UniTask WaitForHelicopterLanding(CancellationToken cancellationToken)
 	{
-		
 	}
-	
+
 	[UsedImplicitly]
 	private void OnHelicopterLeft()
 	{
 		_cancellationToken = CancellationToken.None;
 		ReturnToPool();
 	}
-	
+
 	private GameObject CreateExfilPoint()
 	{
 		var extractionPoint = new GameObject
@@ -126,7 +126,7 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 		extractionCollider.size = new Vector3(16.5f, 20f, 15);
 		extractionCollider.isTrigger = true;
 		extractionPoint.AddComponent<HeliExfiltrationPoint>();
-		
+
 		return extractionPoint;
 	}
 }
