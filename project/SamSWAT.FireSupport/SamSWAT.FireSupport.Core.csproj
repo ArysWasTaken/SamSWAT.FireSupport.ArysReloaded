@@ -114,6 +114,6 @@
   </Target>
 
   <Target Name="CreateReleaseZip" AfterTargets="PostBuild">
-    <Exec Command="if not &quot;$(ConfigurationName)&quot;==&quot;Debug&quot; (&#xA;    cd /D &quot;$(SptBepInExPluginsDir)..\..\&quot;&#xA;    &quot;C:\Program Files\7-Zip\7z.exe&quot; a &quot;$(ReleaseArchive)&quot; &quot;BepInEx\plugins\$(SolutionName)\*&quot;&#xA;)" />
+    <Exec Command="if not &quot;$(ConfigurationName)&quot;==&quot;Debug&quot; (&#xA;    cd /D &quot;$(SptBepInExPluginsDir)..\..\&quot;&#xA;    &quot;C:\Program Files\7-Zip\7z.exe&quot; a &quot;$(ReleaseArchive)&quot; &quot;BepInEx\plugins\$(SolutionName)\*&quot;&#xA;    &quot;C:\Program Files\7-Zip\7z.exe&quot; a &quot;$(ReleaseArchive)&quot; &quot;SPT\user\mods\$(SolutionName)\*&quot;&#xA;)" />
   </Target>
 </Project>
