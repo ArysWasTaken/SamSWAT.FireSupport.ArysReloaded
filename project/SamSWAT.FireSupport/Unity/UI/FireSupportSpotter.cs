@@ -125,10 +125,8 @@ public class FireSupportSpotter : ScriptableObject
 		_spotterRotationObj.SetActive(true);
 		_inputManager.SetActive(false);
 		
-		while (!Input.GetMouseButtonDown(0))
+		while (!Input.GetMouseButtonDown(0) && !cancellationToken.IsCancellationRequested)
 		{
-			cancellationToken.ThrowIfCancellationRequested();
-			
 			if (IsRequestCancelled())
 			{
 				_requestCancelled = true;
@@ -140,7 +138,7 @@ public class FireSupportSpotter : ScriptableObject
 			float xAxisRotation = Input.GetAxis("Mouse X") * 5;
 			_spotterRotationObj.transform.Rotate(Vector3.down, xAxisRotation);
 			
-			await UniTask.NextFrame();
+			await UniTask.NextFrame(cancellationToken);
 		}
 		
 		_inputManager.SetActive(true);
