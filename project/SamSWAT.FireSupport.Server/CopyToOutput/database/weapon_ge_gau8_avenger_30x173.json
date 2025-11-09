@@ -1,4 +1,10 @@
 {
+  "blacklist": {
+    "all": true,
+    "flea": true,
+    "fence": true,
+    "scavCase": true
+  },
   "locales": {
     "en": {
       "name": "Fairchild Republic A-10 Thunderbolt II",

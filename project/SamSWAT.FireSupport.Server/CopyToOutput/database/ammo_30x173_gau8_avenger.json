@@ -1,4 +1,10 @@
 {
+  "blacklist": {
+    "all": true,
+    "flea": true,
+    "fence": true,
+    "scavCase": true
+  },
   "locales": {
     "en": {
       "name": "PGU-13/B HEI High Explosive Incendiary",

@@ -1,7 +1,10 @@
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
+using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Spt.Mod;
+using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services.Mod;
 using System.Reflection;
 
@@ -24,9 +27,16 @@ public record ServerModMetadata : AbstractModMetadata
 
 [Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 1)]
 public class ServerMod(
+	ConfigServer configServer,
 	ModHelper modHelper,
-	CustomItemService customItemService) : IOnLoad
+	CustomItemService customItemService)
+	: IOnLoad
 {
+	private readonly ItemConfig _itemConfig = configServer.GetConfig<ItemConfig>();
+	private readonly TraderConfig _traderConfig = configServer.GetConfig<TraderConfig>();
+	private readonly RagfairConfig _ragfairConfig = configServer.GetConfig<RagfairConfig>();
+	private readonly ScavCaseConfig _scavCaseConfig = configServer.GetConfig<ScavCaseConfig>();
+
 	public Task OnLoad()
 	{
 		AddCustomItems();
@@ -42,8 +52,38 @@ public class ServerMod(
 
 		foreach (string databaseFile in databaseFiles)
 		{
-			var newItemDetails = modHelper.GetJsonDataFromFile<NewItemDetails>(pathToModDatabase, databaseFile);
+			var newItemDetails = modHelper.GetJsonDataFromFile<NewCustomItemDetails>(pathToModDatabase, databaseFile);
 			customItemService.CreateItem(newItemDetails);
+			AddItemToBlacklists(newItemDetails);
+		}
+	}
+
+	private void AddItemToBlacklists(NewCustomItemDetails newItemDetails)
+	{
+		if (newItemDetails.BlacklistDetails == null) return;
+		
+		MongoId itemId = newItemDetails.NewItem!.Id;
+
+		if (!newItemDetails.BlacklistDetails.BlacklistGlobally)
+		{
+			if (newItemDetails.BlacklistDetails.BlacklistFromFence)
+			{
+				_traderConfig.Fence.Blacklist.Add(itemId);
+			}
+
+			if (newItemDetails.BlacklistDetails.BlacklistFromFlea)
+			{
+				_ragfairConfig.Dynamic.Blacklist.Custom.Add(itemId);
+			}
+
+			if (newItemDetails.BlacklistDetails.BlacklistFromScavCase)
+			{
+				_scavCaseConfig.RewardItemParentBlacklist.Add(itemId);
+			}
+		}
+		else
+		{
+			_itemConfig.Blacklist.Add(itemId);
 		}
 	}
 }
