@@ -100,11 +100,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Remove="global.json" />
     <None Remove="build\**" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <Compile Remove="build\**" />
     <EmbeddedResource Remove="build\**" />
   </ItemGroup>

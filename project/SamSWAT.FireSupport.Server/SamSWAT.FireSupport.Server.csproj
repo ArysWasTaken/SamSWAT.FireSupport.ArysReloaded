@@ -19,6 +19,12 @@
     <CopyToOutputDir>$(MSBuildThisFileDirectory)CopyToOutput</CopyToOutputDir>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="build\**" />
+    <Compile Remove="build\**" />
+    <EmbeddedResource Remove="build\**" />
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if not exist &quot;$(SptServerModsDir)$(SolutionName)&quot; (&#xA;    mkdir &quot;$(SptServerModsDir)$(SolutionName)&quot;&#xA;)&#xA;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(SptServerModsDir)$(SolutionName)\$(TargetFileName)&quot;&#xA;(robocopy &quot;$(CopyToOutputDir)&quot; &quot;$(SptServerModsDir)$(SolutionName)&quot; /E /XF .gitkeep) ^&amp; if %ERRORLEVEL% leq 3 exit 0" />
   </Target>
