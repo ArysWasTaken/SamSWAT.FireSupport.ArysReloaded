@@ -152,19 +152,23 @@ public class FireSupportSpotter : ScriptableObject
 			_spotterRotationObj.transform.rotation);
 	}
 
-	public async UniTask ConfirmLocation(CancellationToken cancellationToken)
+	public async UniTask<bool> ConfirmLocation(CancellationToken cancellationToken)
 	{
 		if (_requestCancelled)
 		{
-			return;
+			return false;
 		}
 
-		_spotterConfirmationObj.transform.SetPositionAndRotation(_spotterPositionObj.transform.position + Vector3.up,
+		_spotterConfirmationObj.transform.SetPositionAndRotation(
+			_spotterPositionObj.transform.position + Vector3.up,
 			Quaternion.identity);
 		_spotterConfirmationObj.SetActive(true);
+		
 		await UniTask.WaitForSeconds(0.8f, cancellationToken: cancellationToken);
 
 		_spotterConfirmationObj.SetActive(false);
+
+		return true;
 	}
 
 	private bool IsRequestCancelled()

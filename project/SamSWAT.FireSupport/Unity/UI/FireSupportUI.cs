@@ -71,7 +71,7 @@ public class FireSupportUI : UpdatableComponentBase, IPointerEnterHandler, IPoin
 	{
 		FireSupportUIElement uiElement = supportOptions[(int)service.SupportType];
 
-		if (service.IsRequestAvailable())
+		if (service.IsRequestAvailable() && FireSupportController.Instance.IsSupportAvailable())
 		{
 			uiElement.AmountText.color = _enabledColor;
 			uiElement.Icon.color = _enabledColor;

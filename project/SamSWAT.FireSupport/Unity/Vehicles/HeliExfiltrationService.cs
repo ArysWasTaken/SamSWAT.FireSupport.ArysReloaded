@@ -13,18 +13,11 @@ public sealed class HeliExfiltrationService(FireSupportSpotter spotter, int maxR
 
 	public override async UniTaskVoid PlanRequest(CancellationToken cancellationToken)
 	{
-		try
+		Vector3 position = await spotter.SetLocation(checkSpace: true, cancellationToken);
+		
+		if (await spotter.ConfirmLocation(cancellationToken))
 		{
-			Vector3 position = await spotter.SetLocation(checkSpace: true, cancellationToken);
-			await spotter.ConfirmLocation(cancellationToken);
 			ConfirmRequest(position, cancellationToken).Forget();
-		}
-		catch (OperationCanceledException)
-		{
-		}
-		catch (Exception ex)
-		{
-			FireSupportPlugin.LogSource.LogError(ex);
 		}
 	}
 
@@ -32,6 +25,7 @@ public sealed class HeliExfiltrationService(FireSupportSpotter spotter, int maxR
 	{
 		requestAvailable = false;
 		availableRequests--;
+		FireSupportController.Instance.CanCallSupport(false);
 
 		IFireSupportBehaviour uh60 = FireSupportPoolManager.Instance.TakeFromPool(SupportType);
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.StationExtractionRequest);

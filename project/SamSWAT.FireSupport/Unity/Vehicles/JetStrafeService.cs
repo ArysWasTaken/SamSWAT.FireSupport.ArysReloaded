@@ -11,24 +11,18 @@ public sealed class JetStrafeService(FireSupportSpotter spotter, int maxRequests
 
 	public override async UniTaskVoid PlanRequest(CancellationToken cancellationToken)
 	{
-		try
+		await spotter.SetLocation(checkSpace: false, cancellationToken);
+
+		(Vector3 startPos, Vector3 endPos, Quaternion _) directionData =
+			await spotter.SetSupportDirection(cancellationToken);
+
+		if (await spotter.ConfirmLocation(cancellationToken))
 		{
-			await spotter.SetLocation(checkSpace: false, cancellationToken);
-			(Vector3 startPos, Vector3 endPos, Quaternion _) directionData =
-				await spotter.SetSupportDirection(cancellationToken);
-			await spotter.ConfirmLocation(cancellationToken);
 			ConfirmRequest(
 					strafeStartPos: directionData.startPos,
 					strafeEndPos: directionData.endPos,
 					cancellationToken)
 				.Forget();
-		}
-		catch (OperationCanceledException)
-		{
-		}
-		catch (Exception ex)
-		{
-			FireSupportPlugin.LogSource.LogError(ex);
 		}
 	}
 
@@ -37,6 +31,7 @@ public sealed class JetStrafeService(FireSupportSpotter spotter, int maxRequests
 	{
 		requestAvailable = false;
 		availableRequests--;
+		FireSupportController.Instance.CanCallSupport(false);
 
 		IFireSupportBehaviour a10 = FireSupportPoolManager.Instance.TakeFromPool(SupportType);
 		FireSupportController.Instance

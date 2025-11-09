@@ -5,6 +5,7 @@ using EFT.UI;
 using EFT.UI.Gestures;
 using SamSWAT.FireSupport.ArysReloaded.Utils;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using UnityEngine;
 
@@ -22,6 +23,9 @@ public class FireSupportController : UIInputNode
 
 	[NonSerialized] private readonly FireSupportServiceMappings _services = new(new SupportTypeComparer());
 
+	[NonSerialized] private bool _canCallSupport = true;
+	[NonSerialized] private int _cooldownTimer;
+
 	public static FireSupportController Instance { get; private set; }
 
 	public static async UniTask<FireSupportController> Create(GesturesMenu gesturesMenu)
@@ -29,6 +33,18 @@ public class FireSupportController : UIInputNode
 		Instance = new GameObject("FireSupportController").AddComponent<FireSupportController>();
 		await Instance.Initialize(gesturesMenu);
 		return Instance;
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public void CanCallSupport(bool canCall)
+	{
+		_canCallSupport = canCall;
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public bool IsSupportAvailable()
+	{
+		return _cooldownTimer == 0 && _canCallSupport;
 	}
 
 	private async UniTask Initialize(GesturesMenu gesturesMenu)
@@ -85,22 +101,19 @@ public class FireSupportController : UIInputNode
 		}
 	}
 
-	public async UniTaskVoid StartCooldown(float time, CancellationToken cancellationToken, Action callback = null)
+	public async UniTaskVoid StartCooldown(int time, CancellationToken cancellationToken, Action callback = null)
 	{
 		try
 		{
 			_ui.timerText.enabled = true;
+			_cooldownTimer = time;
 
-			while (time > 0)
+			while (_cooldownTimer > 0)
 			{
-				time--;
-				if (time < 0)
-				{
-					time = 0;
-				}
+				_cooldownTimer--;
 
-				float minutes = Mathf.FloorToInt(time / 60);
-				float seconds = Mathf.FloorToInt(time % 60);
+				float minutes = Mathf.FloorToInt(_cooldownTimer / 60f);
+				float seconds = Mathf.FloorToInt(_cooldownTimer % 60);
 
 				using (Utf16ValueStringBuilder sb = ZString.CreateStringBuilder())
 				{
@@ -118,6 +131,7 @@ public class FireSupportController : UIInputNode
 				FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.StationAvailable);
 			}
 
+			CanCallSupport(true);
 			callback?.Invoke();
 		}
 		catch (Exception ex)

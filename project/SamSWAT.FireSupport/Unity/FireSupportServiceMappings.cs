@@ -10,6 +10,8 @@ public class FireSupportServiceMappings(
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public bool AnyAvailableRequests()
 	{
-		return Count > 0 && Values.AsValueEnumerable().Any(service => service.IsRequestAvailable());
+		return Count > 0 &&
+			Values.AsValueEnumerable().Any(service => service.IsRequestAvailable()) &&
+			FireSupportController.Instance.IsSupportAvailable();
 	}
 }
