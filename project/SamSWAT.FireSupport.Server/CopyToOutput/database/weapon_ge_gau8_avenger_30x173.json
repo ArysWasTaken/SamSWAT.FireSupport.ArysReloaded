@@ -30,7 +30,6 @@
       "BaseMalfunctionChance": 0,
       "BoltAction": false,
       "BurstShotsCount": 3,
-      "CameraRecoil": 0.4,
       "CameraSnap": 8,
       "CameraToWeaponAngleSpeedRange": {
         "x": 0.1,
