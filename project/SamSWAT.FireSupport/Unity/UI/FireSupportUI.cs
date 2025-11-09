@@ -5,6 +5,7 @@ using EFT.UI;
 using EFT.UI.Gestures;
 using SamSWAT.FireSupport.ArysReloaded.Utils;
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -45,8 +46,12 @@ public class FireSupportUI : UpdatableComponentBase, IPointerEnterHandler, IPoin
 
 	public override void ManualUpdate()
 	{
+		if (!HasFinishedInitialization || _player == null) return;
+		
 		bool rangefinderInHands = HasRangefinderEquipped();
+		
 		tooltip.SetUnlockStatus(rangefinderInHands);
+		
 		if (rangefinderInHands)
 		{
 			RenderUI();
@@ -138,8 +143,10 @@ public class FireSupportUI : UpdatableComponentBase, IPointerEnterHandler, IPoin
 		HasFinishedInitialization = true;
 	}
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private bool HasRangefinderEquipped()
 	{
+		if (_player.HandsController == null) return false;
 		return _player.HandsController.Item?.TemplateId == ItemConstants.RANGEFINDER_TPL;
 	}
 
