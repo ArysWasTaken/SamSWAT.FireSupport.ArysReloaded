@@ -13,11 +13,12 @@ public sealed class HeliExfiltrationService(FireSupportSpotter spotter, int maxR
 
 	public override async UniTaskVoid PlanRequest(CancellationToken cancellationToken)
 	{
-		Vector3 position = await spotter.SetLocation(checkSpace: true, cancellationToken);
-		
-		if (await spotter.ConfirmLocation(cancellationToken))
+		SetLocationResult locationResult = await spotter.SetLocation(checkSpace: true, cancellationToken);
+
+		if (locationResult.Success)
 		{
-			ConfirmRequest(position, cancellationToken).Forget();
+			await spotter.ConfirmLocation(cancellationToken);
+			ConfirmRequest(locationResult.TargetLocation, cancellationToken).Forget();
 		}
 	}
 

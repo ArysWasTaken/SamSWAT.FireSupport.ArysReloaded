@@ -11,16 +11,18 @@ public sealed class JetStrafeService(FireSupportSpotter spotter, int maxRequests
 
 	public override async UniTaskVoid PlanRequest(CancellationToken cancellationToken)
 	{
-		await spotter.SetLocation(checkSpace: false, cancellationToken);
+		SetLocationResult locationResult = await spotter.SetLocation(checkSpace: false, cancellationToken);
 
-		(Vector3 startPos, Vector3 endPos, Quaternion _) directionData =
-			await spotter.SetSupportDirection(cancellationToken);
+		if (!locationResult.Success) return;
 
-		if (await spotter.ConfirmLocation(cancellationToken))
+		SetDirectionResult directionResult = await spotter.SetSupportDirection(cancellationToken);
+
+		if (directionResult.Success)
 		{
+			await spotter.ConfirmLocation(cancellationToken);
 			ConfirmRequest(
-					strafeStartPos: directionData.startPos,
-					strafeEndPos: directionData.endPos,
+					strafeStartPos: directionResult.StartPosition,
+					strafeEndPos: directionResult.EndPosition,
 					cancellationToken)
 				.Forget();
 		}

@@ -4,12 +4,17 @@ namespace SamSWAT.FireSupport.ArysReloaded.Unity;
 
 public class ColliderReporter : UpdatableComponentBase
 {
-	private bool _hasCollision;
+	private Transform _transform;
 	private BoxCollider[] _colliders;
 	private Collider[] _intersectedColliders;
 	private int _mask;
 
-	public bool HasCollision => _hasCollision;
+	public bool HasCollision { get; private set; }
+
+	public void Rotate(float angle)
+	{
+		_transform.Rotate(Vector3.up, angle);
+	}
 
 	public override void ManualUpdate()
 	{
@@ -30,16 +35,17 @@ public class ColliderReporter : UpdatableComponentBase
 
 			if (hits > 0)
 			{
-				_hasCollision = true;
+				HasCollision = true;
 				break;
 			}
 
-			_hasCollision = false;
+			HasCollision = false;
 		}
 	}
 
 	protected override void OnAwake()
 	{
+		_transform = transform;
 		_intersectedColliders = new Collider[5];
 		_colliders = GetComponents<BoxCollider>();
 		_mask = LayerMaskClass.LowPolyColliderLayerMask | LayerMaskClass.HighPolyCollider;

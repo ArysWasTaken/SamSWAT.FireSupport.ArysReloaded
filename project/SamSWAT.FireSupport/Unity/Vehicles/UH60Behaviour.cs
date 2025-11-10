@@ -83,15 +83,18 @@ public sealed class UH60Behaviour : FireSupportBehaviour
 	private async UniTaskVoid OnHelicopterArrive()
 	{
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliPickingUp);
+
 		GameObject extractionPoint = CreateExfilPoint();
-		float waitTime = PluginSettings.HelicopterWaitTime.Value * 0.75f;
+
+		int configWaitTime = PluginSettings.HelicopterWaitTime.Value;
+		float waitTime = configWaitTime * 0.75f;
 
 		await UniTask.WaitForSeconds(waitTime, cancellationToken: _cancellationToken);
 
 		FireSupportAudio.Instance.PlayVoiceover(EVoiceoverType.SupportHeliHurry);
 
 		await UniTask.WaitForSeconds(
-			duration: PluginSettings.HelicopterWaitTime.Value - waitTime,
+			duration: configWaitTime - waitTime,
 			cancellationToken: _cancellationToken);
 
 		helicopterAnimator.SetTrigger(s_flyAway);
