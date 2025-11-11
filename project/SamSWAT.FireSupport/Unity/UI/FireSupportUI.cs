@@ -5,6 +5,7 @@ using EFT.UI;
 using EFT.UI.Gestures;
 using SamSWAT.FireSupport.ArysReloaded.Utils;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -66,16 +67,17 @@ public class FireSupportUI : UpdatableComponentBase, IPointerEnterHandler, IPoin
 			return;
 		}
 
-		foreach (IFireSupportService service in _services.Values)
+		foreach (KeyValuePair<ESupportType, IFireSupportService> serviceMapping in _services)
 		{
-			RenderButton(service);
+			RenderButton(serviceMapping);
 		}
 	}
 
-	private void RenderButton(IFireSupportService service)
+	private void RenderButton(KeyValuePair<ESupportType, IFireSupportService> serviceMapping)
 	{
-		FireSupportUIElement uiElement = supportOptions[(int)service.SupportType];
-
+		FireSupportUIElement uiElement = supportOptions[(int)serviceMapping.Key];
+		IFireSupportService service = serviceMapping.Value;
+		
 		if (service.IsRequestAvailable() && FireSupportController.Instance.IsSupportAvailable())
 		{
 			uiElement.AmountText.color = _enabledColor;
@@ -103,6 +105,8 @@ public class FireSupportUI : UpdatableComponentBase, IPointerEnterHandler, IPoin
 
 		for (var i = 0; i < supportOptions.Length; i++)
 		{
+			if (!IsValidButton(i)) continue;
+
 			FireSupportUIElement uiElement = supportOptions[i];
 
 			if (_services.AnyAvailableRequests() &&
@@ -118,10 +122,26 @@ public class FireSupportUI : UpdatableComponentBase, IPointerEnterHandler, IPoin
 			}
 		}
 
-		if (Input.GetMouseButtonDown(0))
+		if (Input.GetMouseButtonDown(0) && selectedSupportOption != ESupportType.None)
 		{
 			SupportRequested?.Invoke(selectedSupportOption);
 		}
+	}
+
+	private bool IsValidButton(int i)
+	{
+		var isValidButton = false;
+			
+		foreach (ESupportType supportType in _services.Keys)
+		{
+			if ((int)supportType == i)
+			{
+				isValidButton = true;
+				break;
+			}
+		}
+
+		return isValidButton;
 	}
 
 	private void Initialize(FireSupportServiceMappings services, GesturesMenu gesturesMenu)
