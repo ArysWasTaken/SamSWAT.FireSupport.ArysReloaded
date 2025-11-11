@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Unity;
 
-public class FireSupportUI : UpdatableComponentBase, IPointerEnterHandler, IPointerExitHandler
+public class FireSupportUI : UpdatableComponentBase, IPointerEnterHandler, IPointerExitHandler, IDisposable
 {
 	public GameObject SpotterNotice;
 	public GameObject SpotterHeliNotice;
@@ -43,6 +43,12 @@ public class FireSupportUI : UpdatableComponentBase, IPointerEnterHandler, IPoin
 			.GetComponent<FireSupportUI>();
 		Instance.Initialize(services, gesturesMenu);
 		return Instance;
+	}
+
+	public void Dispose()
+	{
+		Destroy(gameObject);
+		Instance = null;
 	}
 
 	public override void ManualUpdate()

@@ -56,12 +56,12 @@ public class FireSupportController : UIInputNode
 		var heliExfil = new HeliExfiltrationService(
 			_spotter,
 			PluginSettings.AmountOfExtractionRequests.Value);
-		_services.Add(heliExfil.SupportType, heliExfil);
+		_services[heliExfil.SupportType] = heliExfil;
 
 		var jetStrafe = new JetStrafeService(
 			_spotter,
 			PluginSettings.AmountOfStrafeRequests.Value);
-		_services.Add(jetStrafe.SupportType, jetStrafe);
+		_services[jetStrafe.SupportType] = jetStrafe;
 
 		_ui = await FireSupportUI.Load(_services, gesturesMenu);
 		_ui.SupportRequested += OnSupportRequested;
@@ -75,6 +75,11 @@ public class FireSupportController : UIInputNode
 	{
 		_ui.SupportRequested -= OnSupportRequested;
 		AssetLoader.UnloadAllBundles();
+		FireSupportAudio.Instance.Dispose();
+		Destroy(_spotter);
+		FireSupportUI.Instance.Dispose();
+		Destroy(gameObject);
+		Instance = null;
 	}
 
 	private void OnSupportRequested(ESupportType supportType)

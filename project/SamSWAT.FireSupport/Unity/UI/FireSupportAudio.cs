@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Unity;
 
-public class FireSupportAudio : ScriptableObject
+public class FireSupportAudio : ScriptableObject, IDisposable
 {
 	[SerializeField] private AudioClip[] stationReminder;
 	[SerializeField] private AudioClip[] stationAvailable;
@@ -33,6 +33,12 @@ public class FireSupportAudio : ScriptableObject
 	{
 		Instance = await AssetLoader.LoadAssetAsync<FireSupportAudio>("assets/content/ui/firesupport_audio.bundle");
 		return Instance;
+	}
+
+	public void Dispose()
+	{
+		Destroy(this);
+		Instance = null;
 	}
 
 	public void PlayVoiceover(EVoiceoverType voiceoverType)

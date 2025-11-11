@@ -21,7 +21,7 @@ public class GesturesMenuPatch : ModulePatch
 {
 	protected override MethodBase GetTargetMethod()
 	{
-		return typeof(GesturesMenu).GetMethod(nameof(GesturesMenu.Init));
+		return typeof(GesturesMenu).GetMethod(nameof(GesturesMenu.Awake));
 	}
 
 	[PatchPostfix]
@@ -29,6 +29,11 @@ public class GesturesMenuPatch : ModulePatch
 	{
 		try
 		{
+			if (FireSupportController.Instance != null)
+			{
+				UnityEngine.Object.Destroy(FireSupportController.Instance);
+			}
+			
 			if (!IsFireSupportAvailable())
 			{
 				return;
