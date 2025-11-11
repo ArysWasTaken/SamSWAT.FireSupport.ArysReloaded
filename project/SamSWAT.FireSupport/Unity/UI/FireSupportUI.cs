@@ -47,8 +47,8 @@ public class FireSupportUI : UpdatableComponentBase, IPointerEnterHandler, IPoin
 
 	public void Dispose()
 	{
-		Destroy(gameObject);
 		Instance = null;
+		DestroyImmediate(gameObject);
 	}
 
 	public override void ManualUpdate()

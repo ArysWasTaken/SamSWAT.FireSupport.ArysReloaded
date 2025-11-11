@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SamSWAT.FireSupport.ArysReloaded.Unity;
 
-public class FireSupportPoolManager
+public class FireSupportPoolManager : IDisposable
 {
 	private readonly Dictionary<ESupportType, FireSupportPool> _pools = new(new SupportTypeComparer());
 
@@ -32,6 +32,12 @@ public class FireSupportPoolManager
 		var heliExfilPool = new FireSupportPool(poolSize, heliExfilObj, poolTransform);
 		heliExfilPool.Fill();
 		Instance._pools.Add(heliExfilObj.SupportType, heliExfilPool);
+	}
+
+	public void Dispose()
+	{
+		_pools.Clear();
+		Instance = null;
 	}
 
 	public IFireSupportBehaviour TakeFromPool(ESupportType supportType)

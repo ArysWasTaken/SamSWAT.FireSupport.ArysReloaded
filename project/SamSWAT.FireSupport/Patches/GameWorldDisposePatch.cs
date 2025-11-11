@@ -18,7 +18,6 @@ public class GameWorldDisposePatch : ModulePatch
 	[PatchPrefix]
 	private static void PatchPrefix()
 	{
-		Logger.LogWarning("Destroying FireSupportController at GameWorld.Dispose");
-		UnityEngine.Object.Destroy(FireSupportController.Instance);
+		UnityEngine.Object.DestroyImmediate(FireSupportController.Instance);
 	}
 }

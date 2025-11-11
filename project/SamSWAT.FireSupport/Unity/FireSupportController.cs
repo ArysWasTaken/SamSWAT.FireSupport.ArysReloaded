@@ -67,19 +67,18 @@ public class FireSupportController : UIInputNode
 		_ui.SupportRequested += OnSupportRequested;
 
 		await FireSupportPoolManager.Initialize(10);
-
-		_audio.PlayVoiceover(EVoiceoverType.StationReminder);
 	}
 
 	private void OnDestroy()
 	{
 		_ui.SupportRequested -= OnSupportRequested;
 		AssetLoader.UnloadAllBundles();
+		FireSupportPoolManager.Instance.Dispose();
 		FireSupportAudio.Instance.Dispose();
-		Destroy(_spotter);
+		DestroyImmediate(_spotter);
 		FireSupportUI.Instance.Dispose();
-		Destroy(gameObject);
 		Instance = null;
+		DestroyImmediate(gameObject);
 	}
 
 	private void OnSupportRequested(ESupportType supportType)
@@ -100,6 +99,7 @@ public class FireSupportController : UIInputNode
 			_gesturesMenu.Close();
 			service.PlanRequest(destroyCancellationToken).Forget();
 		}
+		catch (OperationCanceledException) {}
 		catch (Exception ex)
 		{
 			FireSupportPlugin.LogSource.LogError(ex);
@@ -139,6 +139,7 @@ public class FireSupportController : UIInputNode
 			CanCallSupport(true);
 			callback?.Invoke();
 		}
+		catch (OperationCanceledException) {}
 		catch (Exception ex)
 		{
 			FireSupportPlugin.LogSource.LogError(ex);

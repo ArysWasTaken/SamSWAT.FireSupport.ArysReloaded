@@ -21,17 +21,17 @@ public class GesturesMenuPatch : ModulePatch
 {
 	protected override MethodBase GetTargetMethod()
 	{
-		return typeof(GesturesMenu).GetMethod(nameof(GesturesMenu.Awake));
+		return AccessTools.Method(typeof(EftGamePlayerOwner), nameof(EftGamePlayerOwner.InitBattleUIScreen));
 	}
 
 	[PatchPostfix]
-	private static async void PatchPostfix(GesturesMenu __instance)
+	private static async void PatchPostfix(IBattleUIScreenController ___BattleUIScreenController)
 	{
 		try
 		{
 			if (FireSupportController.Instance != null)
 			{
-				UnityEngine.Object.Destroy(FireSupportController.Instance);
+				UnityEngine.Object.DestroyImmediate(FireSupportController.Instance);
 			}
 			
 			if (!IsFireSupportAvailable())
@@ -40,16 +40,23 @@ public class GesturesMenuPatch : ModulePatch
 			}
 
 			var owner = Singleton<GameWorld>.Instance.MainPlayer.GetComponent<GamePlayerOwner>();
-			var fireSupportController = await FireSupportController.Create(__instance);
+			
+			GesturesMenu gesturesMenu = ___BattleUIScreenController.GesturesQuickPanel.GesturesMenu;
+			
+			var fireSupportController = await FireSupportController.Create(gesturesMenu);
+			
 			Traverse.Create(owner)
 				.Field<List<InputNode>>("_children")
 				.Value
 				.Add(fireSupportController);
 
-			var gesturesBindPanel =
-				__instance.gameObject.GetComponentInChildren<GesturesBindPanel>(includeInactive: true);
+			var gesturesBindPanel = (GesturesBindPanel)AccessTools.Field(typeof(GesturesMenu),
+					"_gesturesBindPanel")
+				.GetValue(gesturesMenu);
+			
 			gesturesBindPanel.transform.localPosition = new Vector3(0, -530, 0);
 		}
+		catch (OperationCanceledException) {}
 		catch (Exception ex)
 		{
 			FireSupportPlugin.LogSource.LogError(ex);

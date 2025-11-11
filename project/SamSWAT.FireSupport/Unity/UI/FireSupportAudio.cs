@@ -37,8 +37,8 @@ public class FireSupportAudio : ScriptableObject, IDisposable
 
 	public void Dispose()
 	{
-		Destroy(this);
 		Instance = null;
+		DestroyImmediate(this);
 	}
 
 	public void PlayVoiceover(EVoiceoverType voiceoverType)
